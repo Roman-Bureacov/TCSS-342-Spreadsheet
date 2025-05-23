@@ -15,6 +15,6 @@ public interface ExpressionReader {
      * @param pCells the table of cells and their values
      * @return the value of the expression
      */
-    double evaluate(String pExpression, Map<String, Integer> pCells);
+    double evaluate(String pExpression, Map<String, Double> pCells);
 
 }
