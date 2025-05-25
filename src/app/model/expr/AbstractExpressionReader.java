@@ -12,8 +12,8 @@ abstract class AbstractExpressionReader implements ExpressionReader {
 
     static {
         // regex that searches for floating points, integers
-        // and expression symbols
-        final String lExpRegex = "(\\d+\\.\\d+|\\d+|[()+\\-*/])";
+        // expression symbols, and cell references (R#C#)
+        final String lExpRegex = "(R\\d+C\\d+|\\d+\\.\\d+|\\d+|[()+\\-*/])";
         EXPRESSION_MATCHER = Pattern.compile(lExpRegex);
         final String lCellRefRegex = "R\\d+C\\d+";
         CELLREF_MATCHER = Pattern.compile(lCellRefRegex);

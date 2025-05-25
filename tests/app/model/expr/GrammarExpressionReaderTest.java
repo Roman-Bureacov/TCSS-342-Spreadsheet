@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 public class GrammarExpressionReaderTest {
     private ExpressionReader iReader;
     private Map<String, Double> iDummyCells;
+    private Map<String, Double> iTestExpressions;
 
     private static final String GENERIC_ERROR_MSG = "Expression did not evaluate correctly";
 
@@ -18,6 +19,7 @@ public class GrammarExpressionReaderTest {
     public void setup() {
         this.iReader = new GrammarExpressionReader();
         this.iDummyCells = new HashMap<>();
+        this.iTestExpressions = new HashMap<>();
     }
 
     @Test
@@ -104,26 +106,53 @@ public class GrammarExpressionReaderTest {
 
     @Test
     public void complexFunctionTest() {
-        final Map<String, Double> lExpressions = new HashMap<>();
-        lExpressions.put("5+3*11", (double) (5+3*11));
-        lExpressions.put("5-4-3-2-1", (double) (5-4-3-2-1));
-        lExpressions.put("50+3*(5-2)", (double) (50 + 3 * (5-2)));
-        lExpressions.put("5-(4-3)-2-1", (double) (5-(4-3)-2-1));
+        this.iTestExpressions.put("5+3*11", (double) (5+3*11));
+        this.iTestExpressions.put("5-4-3-2-1", (double) (5-4-3-2-1));
+        this.iTestExpressions.put("50+3*(5-2)", (double) (50 + 3 * (5-2)));
+        this.iTestExpressions.put("5-(4-3)-2-1", (double) (5-(4-3)-2-1));
 
-        this.basicTests(lExpressions);
+        this.basicTests(this.iTestExpressions);
     }
 
     @Test
     public void floatTests() {
-        final Map<String, Double> lExpressions = new HashMap<>();
-        lExpressions.put("5.5*3", 5.5d*3d);
-        lExpressions.put("1.001*100", 1.001d*100d);
-        lExpressions.put("2.1/1", 2.1d/1d);
-        lExpressions.put("5/2.5", 5d/2.5d);
-        lExpressions.put("5.5-2.5", 5.5d-2.5d);
-        lExpressions.put("5.0-(3-3.1)", 5.0d-(3d-3.1d));
+        this.iTestExpressions.put("5.5*3", 5.5d*3d);
+        this.iTestExpressions.put("1.001*100", 1.001d*100d);
+        this.iTestExpressions.put("2.1/1", 2.1d/1d);
+        this.iTestExpressions.put("5/2.5", 5d/2.5d);
+        this.iTestExpressions.put("5.5-2.5", 5.5d-2.5d);
+        this.iTestExpressions.put("5.0-(3-3.1)", 5.0d-(3d-3.1d));
 
-        this.basicTests(lExpressions);
+        this.basicTests(this.iTestExpressions);
+    }
+
+    @Test
+    public void cellRefTest() {
+        final double lR1C1 = 3d;
+        final double lR22C35 = 6.5d;
+        final double lR2C3 = 0d;
+
+        this.iDummyCells.put("R1C1", lR1C1);
+        this.iDummyCells.put("R22C35", lR22C35);
+        this.iDummyCells.put("R2C3", lR2C3);
+
+        this.iTestExpressions.put("R1C1+3", lR1C1 + 3d);
+        this.iTestExpressions.put("R22C35/3", lR22C35/3d);
+        this.iTestExpressions.put("R1C1*R22C35", lR1C1*lR22C35);
+        this.iTestExpressions.put("R999C999", 0d); // test for non-existent cell
+
+        this.basicTests(this.iTestExpressions, this.iDummyCells);
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> this.iReader.evaluate("3/R2C3", this.iDummyCells),
+                "cell ref expression with divide zero did not return exception"
+        );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> this.iReader.evaluate("RC", this.iDummyCells),
+                "expression reader did not throw expression for bad cell reference"
+        );
     }
 
     /**
