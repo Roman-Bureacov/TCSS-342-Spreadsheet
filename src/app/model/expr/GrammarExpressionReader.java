@@ -34,7 +34,6 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
      */
 
     private Map<String, Double> iSpreadsheetCells;
-    private Deque<String> iExprTokens;
 
     @Override
     public double evaluate(final String pExpression, final Map<String, Double> pCells)
@@ -89,6 +88,7 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
 
     private double nextPrimary(final Deque<String> pTokens) {
         final String lLeftToken = pTokens.removeFirst();
+
         if (isNumber(lLeftToken)) return Double.parseDouble(lLeftToken);
         else if (isCellRef(lLeftToken))
             return this.iSpreadsheetCells.getOrDefault(lLeftToken, 0d);
