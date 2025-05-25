@@ -1,4 +1,4 @@
-package app.model.Expr;
+package app.model.expr;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -21,6 +21,12 @@ abstract class AbstractExpressionReader implements ExpressionReader {
         NUMBER_MATCHER = Pattern.compile(lNumberRegex);
     }
 
+    /**
+     * takes in an expression and splits it up into tokens.
+     * @param pExpression the expression string to tokenize
+     * @return a deque containing all tokens in the overall expression
+     * @throws IllegalArgumentException if there were illegal tokens
+     */
     static Deque<String> tokenize(final String pExpression) throws IllegalArgumentException {
         final Deque<String> lExpressionTokens = new LinkedList<>();
 
