@@ -110,10 +110,40 @@ public class GrammarExpressionReaderTest {
         lExpressions.put("50+3*(5-2)", (double) (50 + 3 * (5-2)));
         lExpressions.put("5-(4-3)-2-1", (double) (5-(4-3)-2-1));
 
-        for (final Map.Entry<String, Double> exprPair : lExpressions.entrySet()) {
+        this.basicTests(lExpressions);
+    }
+
+    @Test
+    public void floatTests() {
+        final Map<String, Double> lExpressions = new HashMap<>();
+        lExpressions.put("5.5*3", 5.5d*3d);
+        lExpressions.put("1.001*100", 1.001d*100d);
+        lExpressions.put("2.1/1", 2.1d/1d);
+        lExpressions.put("5/2.5", 5d/2.5d);
+        lExpressions.put("5.5-2.5", 5.5d-2.5d);
+        lExpressions.put("5.0-(3-3.1)", 5.0d-(3d-3.1d));
+
+        this.basicTests(lExpressions);
+    }
+
+    /**
+     * tests all expressions in the map
+     * @param pExpressions a string-double pair of the expression as a string and the expected value
+     */
+    private void basicTests(final Map<String, Double> pExpressions) {
+        this.basicTests(pExpressions, this.iDummyCells);
+    }
+
+    /**
+     * tests all expressions in the map
+     * @param pExpressions a string-double pair of the expression as a string and the expected value
+     * @param pCells the dummy map of the cells and their values
+     */
+    private void basicTests(final Map<String, Double> pExpressions, final Map<String, Double> pCells) {
+        for (final Map.Entry<String, Double> exprPair : pExpressions.entrySet()) {
             assertEquals(
                     exprPair.getValue(),
-                    this.iReader.evaluate(exprPair.getKey(), this.iDummyCells),
+                    this.iReader.evaluate(exprPair.getKey(), pCells),
                     "Incorrect value for %s: %f".formatted(exprPair.getKey(), exprPair.getValue())
             );
         }
