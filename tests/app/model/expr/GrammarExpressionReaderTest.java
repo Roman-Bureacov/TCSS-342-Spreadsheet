@@ -196,7 +196,7 @@ public class GrammarExpressionReaderTest {
     }
 
     @Test
-    public void leadingSignTest() { // TODO: run these tests
+    public void leadingSignTest() {
         this.iTestExpressions.put("-5+1", -5d+1d);
         this.iTestExpressions.put("5+3/(-5)", 5d+3d/(-5d));
         this.iTestExpressions.put("5+3/(5)", 5d+3d/(5d));
