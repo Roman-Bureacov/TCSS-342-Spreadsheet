@@ -100,6 +100,8 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
                 throw new IllegalArgumentException("Missing closing parenthesis");
             return lExpr;
         } else if (isWord(lLeftToken)) {
+            if (pTokens.isEmpty())
+                throw new IllegalArgumentException("Function opening parenthesis expected");
             if (!"(".equals(pTokens.removeFirst()))
                 throw new IllegalArgumentException("missing opening parenthesis");
             return Functions.apply(lLeftToken, this.nextArgs(pTokens));

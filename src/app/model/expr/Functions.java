@@ -28,6 +28,8 @@ final class Functions {
     }
 
     public static double apply(final String pFunctionName, final Object... pArgs) {
+        if (!FUNC.containsKey(pFunctionName))
+            throw new IllegalArgumentException("Function %s does not exist".formatted(pFunctionName));
         try {
             return FUNC.get(pFunctionName).apply(pArgs);
         } catch (final ClassCastException lCastExc) {

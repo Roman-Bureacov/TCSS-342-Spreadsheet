@@ -151,12 +151,12 @@ public class GrammarExpressionReaderTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> this.iReader.evaluate("RC", this.iDummyCells),
-                "expression reader did not throw expression for bad cell reference"
+                "expression reader did not throw illegal argument exception"
         );
     }
 
     @Test
-    public void badExpressionTest() {
+    public void badExpressionTest() { // TODO: run these tests
         final String[] lBadExpressions = {
                 "33(55)",
                 "2++",
@@ -187,7 +187,7 @@ public class GrammarExpressionReaderTest {
     }
 
     @Test
-    public void leadingSignTest() {
+    public void leadingSignTest() { // TODO: run these tests
         this.iTestExpressions.put("-5+1", -5d+1d);
         this.iTestExpressions.put("+2-100", +2d-100d);
         this.iTestExpressions.put("5+3/(-5)", 5d+3d/(-5d));
