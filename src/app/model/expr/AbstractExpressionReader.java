@@ -9,16 +9,18 @@ abstract class AbstractExpressionReader implements ExpressionReader {
     private static final Pattern EXPRESSION_MATCHER;
     private static final Pattern CELLREF_MATCHER;
     private static final Pattern NUMBER_MATCHER;
+    private static final Pattern WORD_MATCHER;
 
     static {
-        // regex that searches for floating points, integers
-        // expression symbols, and cell references (R#C#)
-        final String lExpRegex = "(R\\d+C\\d+|\\d+\\.\\d+|\\d+|[()+\\-*/])";
+        // regex that first looks for cellref, then floating-point, then integer,
+        // then operators and parentheses, then words, and finally symbols
+        final String lExpRegex = "(R\\d+C\\d+|\\d+\\.\\d+|\\d+|[()+\\-*/]|\\w+|\\W)";
         EXPRESSION_MATCHER = Pattern.compile(lExpRegex);
         final String lCellRefRegex = "R\\d+C\\d+";
         CELLREF_MATCHER = Pattern.compile(lCellRefRegex);
         final String lNumberRegex = "(\\d+\\.\\d+|\\d+)";
         NUMBER_MATCHER = Pattern.compile(lNumberRegex);
+        WORD_MATCHER = Pattern.compile("\\w+");
     }
 
     /**
@@ -28,11 +30,12 @@ abstract class AbstractExpressionReader implements ExpressionReader {
      * @throws IllegalArgumentException if there were illegal tokens
      */
     static Deque<String> tokenize(final String pExpression) throws IllegalArgumentException {
+        final String lWorkingExpression = pExpression.toUpperCase();
         final Deque<String> lExpressionTokens = new LinkedList<>();
 
         // tokenize the expression using regex
         // TODO: check for bad expressions
-        final Matcher lExprTokenizer = EXPRESSION_MATCHER.matcher(pExpression);
+        final Matcher lExprTokenizer = EXPRESSION_MATCHER.matcher(lWorkingExpression);
         while (lExprTokenizer.find()) lExpressionTokens.addLast(lExprTokenizer.group());
 
         return lExpressionTokens;
@@ -48,5 +51,9 @@ abstract class AbstractExpressionReader implements ExpressionReader {
 
     static boolean isNumber(final String pToken) {
         return NUMBER_MATCHER.matcher(pToken).matches();
+    }
+
+    static boolean isWord(final String pToken) {
+        return WORD_MATCHER.matcher(pToken).matches();
     }
 }

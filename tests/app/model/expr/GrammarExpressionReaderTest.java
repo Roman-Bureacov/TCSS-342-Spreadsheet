@@ -155,6 +155,65 @@ public class GrammarExpressionReaderTest {
         );
     }
 
+    @Test
+    public void badExpressionTest() {
+        final String[] lBadExpressions = {
+                "33(55)",
+                "2++",
+                "2-=5",
+                "3..5+21",
+                "((3+1)",
+                "100)-5",
+                "3*/5",
+                "5+-8",
+                "5++1",
+                "5--1",
+                "R1C*0",
+                "5+3*-5",
+                "+",
+                "-",
+                "#",
+                "3$5",
+                "hello world",
+        };
+
+        for (final String expression : lBadExpressions) {
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> this.iReader.evaluate(expression, this.iDummyCells),
+                    "No exception or wrong exception thrown for expression %s".formatted(expression)
+            );
+        }
+    }
+
+    @Test
+    public void leadingSignTest() {
+        this.iTestExpressions.put("-5+1", -5d+1d);
+        this.iTestExpressions.put("+2-100", +2d-100d);
+        this.iTestExpressions.put("5+3/(-5)", 5d+3d/(-5d));
+        this.iTestExpressions.put("5+3/(5)", 5d+3d/(+5d));
+
+        this.basicTests(this.iTestExpressions);
+    }
+
+    @Test
+    public void functionsTest() {
+        this.iTestExpressions.put(
+                "5+AVG(3,4,5)",
+                5d + Functions.apply("AVG", 3d, 4d, 5d)
+        );
+        this.iTestExpressions.put(
+                "AVG(5,2,999,2.5)",
+                Functions.apply("AVG", 5d, 2d, 999d, 2.5d)
+        );
+        this.iTestExpressions.put(
+                "5+AVG(3+4,5*6,7/8)",
+                5d + Functions.apply("AVG", 3d+4d, 5d*6d, 7d/8d)
+        );
+
+        this.basicTests(this.iTestExpressions);
+    }
+
     /**
      * tests all expressions in the map
      * @param pExpressions a string-double pair of the expression as a string and the expected value
