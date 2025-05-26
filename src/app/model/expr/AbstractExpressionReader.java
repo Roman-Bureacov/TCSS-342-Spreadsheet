@@ -18,7 +18,10 @@ abstract class AbstractExpressionReader implements ExpressionReader {
         EXPRESSION_MATCHER = Pattern.compile(lExpRegex);
         final String lCellRefRegex = "R\\d+C\\d+";
         CELLREF_MATCHER = Pattern.compile(lCellRefRegex);
-        final String lNumberRegex = "(\\d+\\.\\d+|\\d+)";
+
+        // checks for negative numbers that have the sign, and positive ones
+        // that do not have the sign
+        final String lNumberRegex = "(-\\d+\\.\\d+|-\\d+|\\d+\\.\\d+|\\d+)";
         NUMBER_MATCHER = Pattern.compile(lNumberRegex);
         WORD_MATCHER = Pattern.compile("\\w+");
     }
@@ -36,7 +39,28 @@ abstract class AbstractExpressionReader implements ExpressionReader {
         // tokenize the expression using regex
         // TODO: check for bad expressions
         final Matcher lExprTokenizer = EXPRESSION_MATCHER.matcher(lWorkingExpression);
-        while (lExprTokenizer.find()) lExpressionTokens.addLast(lExprTokenizer.group());
+        while (lExprTokenizer.find()) {
+            // append the minus to constants
+            // "5" "-" "3" turns into "5" "+" "-3"
+            final String lToken = lExprTokenizer.group();
+            if ("-".equals(lToken)) {
+                if (!lExprTokenizer.find()) throw new IllegalArgumentException("expected argument after minus");
+
+                final String lNextToken = lExprTokenizer.group();
+
+                if (isNumber(lNextToken)) {
+                    // decide to add a plus or not since you can have "1-5" or "1-(-5)"
+                    final String lLastTokenAdded = lExpressionTokens.peekLast();
+                    if (shouldAddPlus(lLastTokenAdded))
+                        lExpressionTokens.addLast("+");
+
+                    lExpressionTokens.addLast("-" + lNextToken);
+                } else {
+                    lExpressionTokens.addLast(lToken);
+                    lExpressionTokens.addLast(lNextToken);
+                }
+            } else lExpressionTokens.addLast(lToken);
+        }
 
         return lExpressionTokens;
     }
@@ -55,5 +79,14 @@ abstract class AbstractExpressionReader implements ExpressionReader {
 
     static boolean isWord(final String pToken) {
         return WORD_MATCHER.matcher(pToken).matches();
+    }
+
+    static boolean shouldAddPlus(final String pLastTokenAdded) {
+        if (pLastTokenAdded == null) return false;
+        else {
+            return isNumber(pLastTokenAdded)
+                    || isCellRef(pLastTokenAdded)
+                    || ")".equals(pLastTokenAdded);
+        }
     }
 }

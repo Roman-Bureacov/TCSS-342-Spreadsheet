@@ -44,6 +44,15 @@ public class GrammarExpressionReaderTest {
     }
 
     @Test
+    public void testSubtraction() {
+        this.iTestExpressions.put("5-3", 5d-3d);
+        this.iTestExpressions.put("5-4-3", 5d-4d-3d);
+        this.iTestExpressions.put("5-4-3-2-1", 5d-4d-3d-2d-1d);
+
+        this.basicTests(this.iTestExpressions);
+    }
+
+    @Test
     public void testMultiplication() {
         assertAll(
                 "tests to see if multiplication works",
@@ -189,9 +198,14 @@ public class GrammarExpressionReaderTest {
     @Test
     public void leadingSignTest() { // TODO: run these tests
         this.iTestExpressions.put("-5+1", -5d+1d);
-        this.iTestExpressions.put("+2-100", +2d-100d);
         this.iTestExpressions.put("5+3/(-5)", 5d+3d/(-5d));
-        this.iTestExpressions.put("5+3/(5)", 5d+3d/(+5d));
+        this.iTestExpressions.put("5+3/(5)", 5d+3d/(5d));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> this.iReader.evaluate("+2-100", this.iDummyCells),
+                "Did not throw IllegalArgumentException for leading + sign"
+        );
 
         this.basicTests(this.iTestExpressions);
     }
