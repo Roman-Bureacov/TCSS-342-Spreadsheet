@@ -202,6 +202,9 @@ public class GrammarExpressionReaderTest {
         this.iTestExpressions.put("-5+1", -5d+1d);
         this.iTestExpressions.put("5+3/(-5)", 5d+3d/(-5d));
         this.iTestExpressions.put("5+3/(5)", 5d+3d/(5d));
+        this.iTestExpressions.put(
+                "5-(-3+AVG(-3,-3,-2))",
+                5d-(-3d+Functions.apply("AVG", -3d,-3d,-2d)));
 
         assertThrows(
                 IllegalArgumentException.class,

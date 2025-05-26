@@ -47,6 +47,11 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
     }
 
     private double nextExpression(final Deque<String> pTokens) {
+        // append a zero to achieve the desired leading unary minus effect
+        if ("-".equals(pTokens.peekFirst())) {
+            pTokens.addFirst("0");
+        }
+
         double lLeftToken = this.nextTerm(pTokens);
 
         while (!pTokens.isEmpty()) {

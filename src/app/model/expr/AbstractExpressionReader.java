@@ -40,21 +40,8 @@ abstract class AbstractExpressionReader implements ExpressionReader {
         // TODO: check for bad expressions
         final Matcher lExprTokenizer = EXPRESSION_MATCHER.matcher(lWorkingExpression);
         while (lExprTokenizer.find()) {
-            // append the minus to constants when they're leading
             final String lToken = lExprTokenizer.group();
-            if ("-".equals(lToken)) {
-                if (!lExprTokenizer.find()) throw new IllegalArgumentException("expected argument after minus");
-
-                final String lNextToken = lExprTokenizer.group();
-                final String lLastTokenAdded = lExpressionTokens.peekLast();
-
-                if (shouldConcatenate(lLastTokenAdded)) {
-                    lExpressionTokens.addLast("-" + lNextToken);
-                } else {
-                    lExpressionTokens.addLast(lToken);
-                    lExpressionTokens.addLast(lNextToken);
-                }
-            } else lExpressionTokens.addLast(lToken);
+            lExpressionTokens.addLast(lToken);
         }
 
         return lExpressionTokens;
