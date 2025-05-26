@@ -103,15 +103,15 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
     private double nextPrimary(final Deque<String> pTokens) {
         final String lLeftToken = pTokens.removeFirst();
 
-        if (isNumber(lLeftToken)) return Double.parseDouble(lLeftToken);
-        else if (isCellRef(lLeftToken))
+        if (this.isNumber(lLeftToken)) return Double.parseDouble(lLeftToken);
+        else if (this.isCellRef(lLeftToken))
             return this.iSpreadsheetCells.getOrDefault(lLeftToken, 0d);
         else if ("(".equals(lLeftToken)) {
             final double lExpr = this.nextExpression(pTokens);
             if (!")".equals(pTokens.removeFirst()))
                 throw new IllegalArgumentException("Missing closing parenthesis");
             return lExpr;
-        } else if (isWord(lLeftToken)) {
+        } else if (this.isWord(lLeftToken)) {
             pTokens.addFirst(lLeftToken);
             return this.nextFunction(pTokens);
         } else throw new IllegalArgumentException("Unknown symbol %s".formatted(lLeftToken));
