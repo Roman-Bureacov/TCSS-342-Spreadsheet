@@ -184,7 +184,8 @@ public class GrammarExpressionReaderTest {
                 "#",
                 "3$5",
                 "hello world",
-                "5+3-AVG(5,3"
+                "5+3-AVG(5,3",
+                "-5+-5",
         };
 
         for (final String expression : lBadExpressions) {
