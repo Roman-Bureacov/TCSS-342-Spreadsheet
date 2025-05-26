@@ -5,6 +5,13 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Abstract class that handles the housekeeping, primarily to tokenize the expressions
+ * the reader implementation receives.
+ *
+ * @author Roman Bureacov
+ * @version 2025-05-24
+ */
 abstract class AbstractExpressionReader implements ExpressionReader {
     private static final Pattern EXPRESSION_MATCHER;
     private static final Pattern CELLREF_MATCHER;
@@ -47,23 +54,24 @@ abstract class AbstractExpressionReader implements ExpressionReader {
         return lExpressionTokens;
     }
 
-    static boolean isExpressionToken(final String pToken) {
+    @Override
+    public boolean isExpressionToken(final String pToken) {
         return EXPRESSION_MATCHER.matcher(pToken).matches();
     }
 
-    static boolean isCellRef(final String pToken) {
+    @Override
+    public boolean isCellRef(final String pToken) {
         return CELLREF_MATCHER.matcher(pToken).matches();
     }
 
-    static boolean isNumber(final String pToken) {
-        return NUMBER_MATCHER.matcher(pToken).matches();
-    }
-
-    static boolean isWord(final String pToken) {
+    @Override
+    public boolean isWord(final String pToken) {
         return WORD_MATCHER.matcher(pToken).matches();
     }
 
-    static boolean shouldConcatenate(final String pLastTokenAdded) {
-        return pLastTokenAdded == null || "(".equals(pLastTokenAdded);
+    @Override
+    public boolean isNumber(final String pToken) {
+        return NUMBER_MATCHER.matcher(pToken).matches();
     }
+
 }

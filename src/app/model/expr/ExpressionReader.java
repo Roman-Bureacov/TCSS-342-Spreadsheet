@@ -6,15 +6,43 @@ import java.util.Map;
  * Defines an expression reader that will parse a given string expression.
  *
  * @author Roman Bureacov
+ * @version 2025-05-24
  */
 public interface ExpressionReader {
 
     /**
-     * Evaluates an expression provided by the string input
+     * Evaluates an expression provided by the string input, such as "3+4-(-5)"
      * @param pExpression the expression, as a string, to evaluate
      * @param pCells the table of cells and their values
      * @return the value of the expression
      */
     double evaluate(String pExpression, Map<String, Double> pCells);
 
+    /**
+     * Returns if the token provided is an expression token in itself
+     * @param pToken the token to evaluate
+     * @return if it is an expression token (word, operator, parenthesis, or number)
+     */
+    boolean isExpressionToken(String pToken);
+
+    /**
+     * Returns if the token provided is a cell reference
+     * @param pToken the token to evaluate
+     * @return if the token is of the format "R#C#" where "#" is any positive integer
+     */
+    boolean isCellRef(String pToken);
+
+    /**
+     * Returns if the token is a word
+     * @param pToken the token to evaluate
+     * @return if the token is a word with only alpha characters
+     */
+    boolean isWord(String pToken);
+
+    /**
+     * Returns if the token is a number
+     * @param pToken the token to evaluate
+     * @return if the token is floating-point or integer, positive or negative
+     */
+    boolean isNumber(String pToken);
 }

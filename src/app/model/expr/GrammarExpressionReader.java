@@ -4,6 +4,12 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
 
+/**
+ * An expression reader than reads in expressions as a grammar.
+ *
+ * @author Roman Bureacov
+ * @version 2025-05-24
+ */
 public final class GrammarExpressionReader extends AbstractExpressionReader {
     /*
     GRAMMAR
