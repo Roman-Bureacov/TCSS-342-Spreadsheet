@@ -216,6 +216,23 @@ public class GrammarExpressionReaderTest {
     }
 
     @Test
+    public void modulusTest() {
+        this.iTestExpressions.put("5%3", 5d%3d);
+        this.iTestExpressions.put("3.33%3", 3.33d%3d);
+        this.iTestExpressions.put("3.125%3.2", 3.125d%3.2d);
+        this.iTestExpressions.put("-3.125%3.2", -3.125d%3.2d);
+        this.iTestExpressions.put("3.125%(-3.2)", 3.125d%(-3.2d));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> this.iReader.evaluate("3%0", this.iDummyCells),
+                "Illegal Argument exception was not thrown for mod 0"
+        );
+
+        this.basicTests(this.iTestExpressions);
+    }
+
+    @Test
     public void functionsTest() {
         this.iTestExpressions.put(
                 "5+AVG(3,4,5)",

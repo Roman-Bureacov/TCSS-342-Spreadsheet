@@ -21,7 +21,7 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
             primary
             term "*" primary
             term "/" primary
-            term "%" primary        // might be too complex to implement
+            term "%" primary
         Primary
             number
             cellref
@@ -82,10 +82,13 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
             final String lNextToken = pTokens.removeFirst();
             switch (lNextToken) {
                 case "*" -> lLeftToken *= this.nextPrimary(pTokens);
-                case "/" -> {
+                case "/", "%" -> {
                     final double lDenominator = this.nextPrimary(pTokens);
                     if (lDenominator == 0d) throw new IllegalArgumentException("Divide by zero");
-                    else lLeftToken /= lDenominator;
+                    else {
+                        if ("/".equals(lNextToken)) lLeftToken /= lDenominator;
+                        else lLeftToken %= lDenominator;
+                    }
                 }
                 default -> {
                     pTokens.addFirst(lNextToken);
