@@ -14,6 +14,7 @@ final class Functions {
     private static final Map<String, Function<Object[], Double>> FUNC = new HashMap<>();
 
     static {
+        // all recognized functions by the applications
         FUNC.put("AVG", args -> {
             double lAvg = 0;
             final double lDenominator = args.length;
