@@ -40,20 +40,15 @@ abstract class AbstractExpressionReader implements ExpressionReader {
         // TODO: check for bad expressions
         final Matcher lExprTokenizer = EXPRESSION_MATCHER.matcher(lWorkingExpression);
         while (lExprTokenizer.find()) {
-            // append the minus to constants
-            // "5" "-" "3" turns into "5" "+" "-3"
+            // append the minus to constants when they're leading
             final String lToken = lExprTokenizer.group();
             if ("-".equals(lToken)) {
                 if (!lExprTokenizer.find()) throw new IllegalArgumentException("expected argument after minus");
 
                 final String lNextToken = lExprTokenizer.group();
+                final String lLastTokenAdded = lExpressionTokens.peekLast();
 
-                if (isNumber(lNextToken)) {
-                    // decide to add a plus or not since you can have "1-5" or "1-(-5)"
-                    final String lLastTokenAdded = lExpressionTokens.peekLast();
-                    if (shouldAddPlus(lLastTokenAdded))
-                        lExpressionTokens.addLast("+");
-
+                if (shouldConcatenate(lLastTokenAdded)) {
                     lExpressionTokens.addLast("-" + lNextToken);
                 } else {
                     lExpressionTokens.addLast(lToken);
@@ -81,12 +76,7 @@ abstract class AbstractExpressionReader implements ExpressionReader {
         return WORD_MATCHER.matcher(pToken).matches();
     }
 
-    static boolean shouldAddPlus(final String pLastTokenAdded) {
-        if (pLastTokenAdded == null) return false;
-        else {
-            return isNumber(pLastTokenAdded)
-                    || isCellRef(pLastTokenAdded)
-                    || ")".equals(pLastTokenAdded);
-        }
+    static boolean shouldConcatenate(final String pLastTokenAdded) {
+        return pLastTokenAdded == null || "(".equals(pLastTokenAdded);
     }
 }
