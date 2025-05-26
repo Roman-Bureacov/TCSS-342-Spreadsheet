@@ -6,8 +6,6 @@ import java.util.Map;
 
 public final class GrammarExpressionReader extends AbstractExpressionReader {
     /*
-    TODO: modify for leading signage
-    TODO: here's an idea: what if instead of the grammar looking for leading signs, the tokenizer does that?
     GRAMMAR
         Expression
             term
@@ -40,7 +38,7 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
     @Override
     public double evaluate(final String pExpression, final Map<String, Double> pCells)
             throws IllegalArgumentException {
-       final Deque<String> lExpressionTokens = tokenize(pExpression);
+        final Deque<String> lExpressionTokens = tokenize(pExpression);
         if (lExpressionTokens.isEmpty()) return 0d;
         else {
             this.iSpreadsheetCells = pCells;
@@ -100,12 +98,18 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
                 throw new IllegalArgumentException("Missing closing parenthesis");
             return lExpr;
         } else if (isWord(lLeftToken)) {
-            if (pTokens.isEmpty())
-                throw new IllegalArgumentException("Function opening parenthesis expected");
-            if (!"(".equals(pTokens.removeFirst()))
-                throw new IllegalArgumentException("missing opening parenthesis");
-            return Functions.apply(lLeftToken, this.nextArgs(pTokens));
+            pTokens.addFirst(lLeftToken);
+            return this.nextFunction(pTokens);
         } else throw new IllegalArgumentException("Unknown symbol %s".formatted(lLeftToken));
+    }
+
+    private double nextFunction(final Deque<String> pTokens) {
+        final String lLeftToken = pTokens.removeFirst();
+        if (pTokens.isEmpty())
+            throw new IllegalArgumentException("Function opening parenthesis expected");
+        if (!"(".equals(pTokens.removeFirst()))
+            throw new IllegalArgumentException("missing opening parenthesis");
+        return Functions.apply(lLeftToken, this.nextArgs(pTokens));
     }
 
     private Object[] nextArgs(final Deque<String> pTokens) {
@@ -121,12 +125,6 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
             }
         }
         throw new IllegalArgumentException("Missing closing parenthesis");
-    }
-
-    private double nextFunction(final Deque<String> pTokens) {
-        // TODO: implement function... functionality
-        System.out.println("Functions are yet to be implemented!");
-        return Double.MAX_VALUE;
     }
 
 }
