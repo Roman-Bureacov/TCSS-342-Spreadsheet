@@ -203,7 +203,7 @@ public class GrammarExpressionReaderTest {
             assertThrows(
                     IllegalArgumentException.class,
                     () -> this.iReader.evaluate(expression, this.iDummyCells),
-                    "No exception or wrong exception thrown for expression %s".formatted(expression)
+                    "Expected IllegalArgumentException for expression %s".formatted(expression)
             );
         }
     }
