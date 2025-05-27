@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -252,24 +253,25 @@ public class GrammarExpressionReaderTest {
 
     @Test
     public void getCellRefTest() {
-        final String lTestExpression1 = "5+R1C3";
-        final String lTestExpression2 = "5+R1C3-R33C1";
-        final String lTestExpression3 = "5+R1C3-R6C2*R1C2";
+        final List<String> lTestExpression1 = this.iReader.getCellRefsOf("5+R1C3");
+        final List<String> lTestExpression2 = this.iReader.getCellRefsOf("5+R1C3-R33C1");
+        final List<String> lTestExpression3 = this.iReader.getCellRefsOf("5+R1C3-R6C2*R1C2");
 
         assertAll(
                 "Test for correct evaluation of how many cell references there are",
-                () -> assertEquals(
-                        1,
-                        this.iReader.getCellRefsOf(lTestExpression1).size()
-                ),
-                () -> assertEquals(
-                        2,
-                        this.iReader.getCellRefsOf(lTestExpression2).size()
-                ),
-                () -> assertEquals(
-                        3,
-                        this.iReader.getCellRefsOf(lTestExpression3).size()
-                )
+                () -> assertEquals(1, lTestExpression1.size()),
+                () -> assertEquals(2, lTestExpression2.size()),
+                () -> assertEquals(3, lTestExpression3.size())
+        );
+
+        assertAll(
+                "Test for if the correct cell references were returned",
+                () -> assertEquals("R1C3", lTestExpression1.getFirst()),
+                () -> assertEquals("R1C3", lTestExpression2.get(0)),
+                () -> assertEquals("R33C1", lTestExpression2.get(1)),
+                () -> assertEquals("R1C3", lTestExpression3.get(0)),
+                () -> assertEquals("R6C2", lTestExpression3.get(1)),
+                () -> assertEquals("R1C2", lTestExpression3.get(2))
         );
     }
 
