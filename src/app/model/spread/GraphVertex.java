@@ -24,6 +24,10 @@ public class GraphVertex {
         return indegree;
     }
 
+    public void setIndegree(int theIndegree) {
+        indegree = theIndegree;
+    }
+
     public void incrementIndegree() {
         indegree++;
     }

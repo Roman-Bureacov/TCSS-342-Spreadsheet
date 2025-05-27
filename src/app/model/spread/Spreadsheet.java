@@ -9,12 +9,24 @@ package app.model.spread;
 public interface Spreadsheet {
 
     /**
-     * Gets a cell using its row and column signature: "R#C#"
+     *
      * @param theRowColumn the row and column of the desired cell, as a string, in the format "R#C#"
-     * @return the spreadsheet cell corresponding to the provided row/column
+     * @return the value of the spreadsheet cell corresponding to the provided row/column
      */
-    public SpreadsheetCell getCell(String theRowColumn);
+    public double getCellValue(String theRowColumn);
 
+    /**
+     *
+     * @param theRowColumn the row and column of the desired cell, as a string, in the format "R#C#"
+     * @return the instructions of the spreadsheet cell corresponding to the provided row/column
+     */
+    public String getCellInstructions(String theRowColumn);
+
+    /**
+     * @param theInstructions the instructions to be provided to the cell
+     * @param theRowColumn the row and column of the desired cell, as a string, in the format "R#C#"
+     */
+    public void setCellInstructions(String theInstructions, String theRowColumn);
     /**
      *
      * @return the amount of rows in the spreadsheet
