@@ -3,6 +3,7 @@ package app.model.expr;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * An expression reader than reads in expressions as a grammar.
@@ -48,7 +49,15 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
         if (lExpressionTokens.isEmpty()) return 0d;
         else {
             this.iSpreadsheetCells = pCells;
-            return this.nextExpression(lExpressionTokens);
+            final double lResult;
+            try {
+                lResult = this.nextExpression(lExpressionTokens);
+            } catch (final NoSuchElementException lException) { // if unexpectedly ran out of tokens
+                throw new IllegalArgumentException("Insufficient tokens in expression");
+            }
+            if (!lExpressionTokens.isEmpty()) throw new IllegalArgumentException("Bad expression");
+
+            return lResult;
         }
     }
 
@@ -108,13 +117,16 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
             return this.iSpreadsheetCells.getOrDefault(lLeftToken, 0d);
         else if ("(".equals(lLeftToken)) {
             final double lExpr = this.nextExpression(pTokens);
-            if (!")".equals(pTokens.removeFirst()))
+            if (!")".equals(pTokens.peekFirst()))
                 throw new IllegalArgumentException("Missing closing parenthesis");
-            return lExpr;
+            else {
+                pTokens.removeFirst();
+                return lExpr;
+            }
         } else if (this.isWord(lLeftToken)) {
             pTokens.addFirst(lLeftToken);
             return this.nextFunction(pTokens);
-        } else throw new IllegalArgumentException("Unknown symbol %s".formatted(lLeftToken));
+        } else throw new IllegalArgumentException("Unexpected symbol %s".formatted(lLeftToken));
     }
 
     private double nextFunction(final Deque<String> pTokens) {

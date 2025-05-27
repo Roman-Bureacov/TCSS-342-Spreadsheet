@@ -194,6 +194,7 @@ public class GrammarExpressionReaderTest {
                 "#",
                 "3$5",
                 "hello world",
+                "hello",
                 "5+3-AVG(5,3",
                 "5AVG(5,3)",
                 "-5+-5",
