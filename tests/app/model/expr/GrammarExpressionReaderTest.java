@@ -169,7 +169,16 @@ public class GrammarExpressionReaderTest {
     public void badExpressionTest() { // TODO: run these tests
         final String[] lBadExpressions = {
                 "33(55)",
+                "33)55",
+                "33,55",
+                "33((55)",
+                "33(55))",
+                "33 55",
+                "33 55)",
+                "33*55)",
+                "(33*55",
                 "2++",
+                "++2",
                 "2-=5",
                 "3..5+21",
                 "((3+1)",
@@ -186,6 +195,7 @@ public class GrammarExpressionReaderTest {
                 "3$5",
                 "hello world",
                 "5+3-AVG(5,3",
+                "5AVG(5,3)",
                 "-5+-5",
         };
 
