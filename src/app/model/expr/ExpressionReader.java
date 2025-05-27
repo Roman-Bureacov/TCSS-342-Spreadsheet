@@ -19,30 +19,29 @@ public interface ExpressionReader {
     double evaluate(String pExpression, Map<String, Double> pCells);
 
     /**
-     * Returns if the token provided is an expression token in itself
-     * @param pToken the token to evaluate
-     * @return if it is an expression token (word, operator, parenthesis, or number)
-     */
-    boolean isExpressionToken(String pToken);
-
-    /**
      * Returns if the token provided is a cell reference
      * @param pToken the token to evaluate
      * @return if the token is of the format "R#C#" where "#" is any positive integer
      */
-    boolean isCellRef(String pToken);
+    static boolean isCellRef(final String pToken) {
+        return TokenAnalyzer.isCellRef(pToken);
+    }
 
     /**
      * Returns if the token is a word
      * @param pToken the token to evaluate
      * @return if the token is a word with only alpha characters
      */
-    boolean isWord(String pToken);
+    static boolean isWord(final String pToken) {
+        return TokenAnalyzer.isWord(pToken);
+    }
 
     /**
      * Returns if the token is a number
      * @param pToken the token to evaluate
      * @return if the token is floating-point or integer, positive or negative
      */
-    boolean isNumber(String pToken);
+    static boolean isNumber(final String pToken) {
+        return TokenAnalyzer.isNumber(pToken);
+    }
 }
