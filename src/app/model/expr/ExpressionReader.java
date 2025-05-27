@@ -1,5 +1,7 @@
 package app.model.expr;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,29 +21,30 @@ public interface ExpressionReader {
     double evaluate(String pExpression, Map<String, Double> pCells);
 
     /**
+     * Returns a list of the cell references used in the expression
+     * @param pExpression the expression to look in
+     * @return a list of cell references used in the argument expression
+     */
+    List<String> getCellRefsOf(String pExpression);
+
+    /**
      * Returns if the token provided is a cell reference
      * @param pToken the token to evaluate
      * @return if the token is of the format "R#C#" where "#" is any positive integer
      */
-    static boolean isCellRef(final String pToken) {
-        return TokenAnalyzer.isCellRef(pToken);
-    }
+    boolean isCellRef(String pToken);
 
     /**
      * Returns if the token is a word
      * @param pToken the token to evaluate
      * @return if the token is a word with only alpha characters
      */
-    static boolean isWord(final String pToken) {
-        return TokenAnalyzer.isWord(pToken);
-    }
+    boolean isWord(String pToken);
 
     /**
      * Returns if the token is a number
      * @param pToken the token to evaluate
      * @return if the token is floating-point or integer, positive or negative
      */
-    static boolean isNumber(final String pToken) {
-        return TokenAnalyzer.isNumber(pToken);
-    }
+    boolean isNumber(String pToken);
 }

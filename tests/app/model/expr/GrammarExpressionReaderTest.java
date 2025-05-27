@@ -250,6 +250,29 @@ public class GrammarExpressionReaderTest {
         this.basicTests(this.iTestExpressions);
     }
 
+    @Test
+    public void getCellRefTest() {
+        final String lTestExpression1 = "5+R1C3";
+        final String lTestExpression2 = "5+R1C3-R33C1";
+        final String lTestExpression3 = "5+R1C3-R6C2*R1C2";
+
+        assertAll(
+                "Test for correct evaluation of how many cell references there are",
+                () -> assertEquals(
+                        1,
+                        this.iReader.getCellRefsOf(lTestExpression1).size()
+                ),
+                () -> assertEquals(
+                        2,
+                        this.iReader.getCellRefsOf(lTestExpression2).size()
+                ),
+                () -> assertEquals(
+                        3,
+                        this.iReader.getCellRefsOf(lTestExpression3).size()
+                )
+        );
+    }
+
     /**
      * tests all expressions in the map
      * @param pExpressions a string-double pair of the expression as a string and the expected value
