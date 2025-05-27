@@ -166,7 +166,7 @@ public class GrammarExpressionReaderTest {
     }
 
     @Test
-    public void badExpressionTest() { // TODO: run these tests
+    public void badExpressionTest() {
         final String[] lBadExpressions = {
                 "33(55)",
                 "33)55",
