@@ -47,7 +47,7 @@ public class SpreadsheetGraph implements Spreadsheet {
 
         GraphVertex temp = adjList.get(theRowColumn);
         temp.getCell().setInstruction(theInstructions);
-
+        evaluateInstructions();
     }
 
     @Override
@@ -65,8 +65,7 @@ public class SpreadsheetGraph implements Spreadsheet {
         return size;
     }
 
-    @Override
-    public void evaluateInstructions() {
+    private void evaluateInstructions() {
         setIndegree();
         Queue<GraphVertex> ordering = new ArrayDeque<>();
         Queue<GraphVertex> noDegree = noDegreeQueue();
@@ -75,8 +74,8 @@ public class SpreadsheetGraph implements Spreadsheet {
             temp.decrementIndegree();
             ordering.add(temp);
             List<GraphVertex> vertexEdgeList = temp.getAdjList();
-            for (int i = 0; i < vertexEdgeList.size(); i++) {
-                vertexEdgeList.get(i).decrementIndegree();
+            while (!vertexEdgeList.isEmpty()) {
+                temp.removeEdge(vertexEdgeList.removeFirst());
             }
             noDegree = noDegreeQueue();
         }
@@ -91,10 +90,25 @@ public class SpreadsheetGraph implements Spreadsheet {
             }
             GraphVertex nextToCalc = ordering.remove();
             String expression = nextToCalc.getCell().getInstruction();
+            expression = expression.replaceAll(" ", "");
             if (expression.startsWith("=")) {
                 expression = expression.substring(1);
+                List<String> cellRefs = mainReader.getCellRefsOf(expression);
+                while (!cellRefs.isEmpty()) {
+                    if (adjList.get(cellRefs.getFirst()) == null) {
+                        expression = expression.replaceAll(cellRefs.getFirst(), "0");
+                    }
+                    cellRefs.removeFirst();
+                }
+                nextToCalc.getCell().setValue(mainReader.evaluate(expression, readerInput));
+            } else {
+                try {
+                    double literal = Double.parseDouble(nextToCalc.getCell().getInstruction());
+                    nextToCalc.getCell().setValue(literal);
+                } catch (NumberFormatException ex) {
+                    nextToCalc.getCell().setValue(0);
+                }
             }
-            nextToCalc.getCell().setValue(mainReader.evaluate(expression, readerInput));
         }
     }
 
@@ -118,9 +132,14 @@ public class SpreadsheetGraph implements Spreadsheet {
             GraphVertex tempVertex = verIterator.next();
             tempVertex.setIndegree(0);
             if (tempVertex.getCell().getInstruction().startsWith("=")) {
-                List<String> CellRefs = mainReader.getCellRefsOf(tempVertex.getCell().getInstruction());
+                String cleanedString = tempVertex.getCell().getInstruction().substring(1);
+                List<String> CellRefs = mainReader.getCellRefsOf(cleanedString);
                 while (!CellRefs.isEmpty()) {
-                    adjList.get(CellRefs.getFirst()).addEdge(tempVertex);
+                    if (adjList.get(CellRefs.getFirst()) != null) {
+                        if (!adjList.get(CellRefs.getFirst()).getAdjList().contains(tempVertex)) {
+                            adjList.get(CellRefs.getFirst()).addEdge(tempVertex);
+                        }
+                    }
                     CellRefs.removeFirst();
                 }
             }
