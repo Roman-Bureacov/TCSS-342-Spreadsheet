@@ -10,6 +10,7 @@ import java.util.*;
 
 /**
  * This is the Graphical User Interface (GUI) for the spreadsheet.
+ *
  * @author David Norman
  * @version Spring 2025
  */
