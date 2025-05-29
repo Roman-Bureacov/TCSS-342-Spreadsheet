@@ -44,9 +44,4 @@ public interface Spreadsheet {
      * @return the total size of the spreadsheet by count of cells
      */
     public int size();
-
-    /**
-     * Updates all cell values to represent what their instructions evaluate to
-     */
-    public void evaluateInstructions();
 }

@@ -20,6 +20,11 @@ public class GraphVertex {
         adjList.add(theVertex);
     }
 
+    public void removeEdge(GraphVertex theVertex) {
+        theVertex.decrementIndegree();
+        adjList.remove(theVertex);
+    }
+
     public int getIndegree() {
         return indegree;
     }
