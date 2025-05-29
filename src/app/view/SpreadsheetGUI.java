@@ -88,7 +88,7 @@ public class SpreadsheetGUI {
     }
 
     private void handleEvaluate(ActionEvent e) {
-        GrammarExpressionReader evaluator = new GrammarExpressionReader();
+        ExpressionReader evaluator = new GrammarExpressionReader();
         Map<String, Double> cellValues = new java.util.HashMap<>();
 
         // First pass: extract all literal numeric values from the table into the map
