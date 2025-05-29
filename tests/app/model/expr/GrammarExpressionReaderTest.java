@@ -220,6 +220,7 @@ public class GrammarExpressionReaderTest {
         this.iTestExpressions.put("3*3^7", 3d * Math.pow(3d, 7d));
         this.iTestExpressions.put("3/3^7", 3d / Math.pow(3d, 7d));
         this.iTestExpressions.put("3+3^7", 3d + Math.pow(3d, 7d));
+        this.iTestExpressions.put("3+3^7-900", 3d + Math.pow(3d, 7d) - 900d);
         this.iTestExpressions.put(
                 "5^AVG(3.15, 4)",
                 Math.pow(5d, Functions.apply("AVG", 3.15d, 4d))
