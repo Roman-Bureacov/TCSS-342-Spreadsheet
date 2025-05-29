@@ -22,7 +22,11 @@ public class SpreadsheetGraph implements Spreadsheet {
 
     @Override
     public double getCellValue(String theRowColumn) {
-        return adjList.get(theRowColumn).getCell().getValue();
+        if (adjList.containsKey(theRowColumn)) {
+            return adjList.get(theRowColumn).getCell().getValue();
+        } else {
+            return 0d;
+        }
     }
 
     @Override
@@ -67,18 +71,7 @@ public class SpreadsheetGraph implements Spreadsheet {
 
     private void evaluateInstructions() {
         setIndegree();
-        Queue<GraphVertex> ordering = new ArrayDeque<>();
-        Queue<GraphVertex> noDegree = noDegreeQueue();
-        while (!noDegree.isEmpty()) {
-            GraphVertex temp = noDegree.remove();
-            temp.decrementIndegree();
-            ordering.add(temp);
-            List<GraphVertex> vertexEdgeList = temp.getAdjList();
-            while (!vertexEdgeList.isEmpty()) {
-                temp.removeEdge(vertexEdgeList.removeFirst());
-            }
-            noDegree = noDegreeQueue();
-        }
+        Queue<GraphVertex> ordering = topSort();
 
         while (!ordering.isEmpty()) {
             Map<String, Double> readerInput = new HashMap<>();
@@ -90,7 +83,6 @@ public class SpreadsheetGraph implements Spreadsheet {
             }
             GraphVertex nextToCalc = ordering.remove();
             String expression = nextToCalc.getCell().getInstruction();
-            expression = expression.replaceAll(" ", "");
             if (expression.startsWith("=")) {
                 expression = expression.substring(1);
                 List<String> cellRefs = mainReader.getCellRefsOf(expression);
@@ -110,6 +102,22 @@ public class SpreadsheetGraph implements Spreadsheet {
                 }
             }
         }
+    }
+
+    private Queue<GraphVertex> topSort() {
+        Queue<GraphVertex> ordering = new ArrayDeque<>();
+        Queue<GraphVertex> noDegree = noDegreeQueue();
+        while (!noDegree.isEmpty()) {
+            GraphVertex temp = noDegree.remove();
+            temp.decrementIndegree();
+            ordering.add(temp);
+            List<GraphVertex> vertexEdgeList = temp.getAdjList();
+            while (!vertexEdgeList.isEmpty()) {
+                temp.removeEdge(vertexEdgeList.removeFirst());
+            }
+            noDegree = noDegreeQueue();
+        }
+        return ordering;
     }
 
     private Queue<GraphVertex> noDegreeQueue() {
