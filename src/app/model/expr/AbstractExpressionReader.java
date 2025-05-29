@@ -41,10 +41,12 @@ abstract class AbstractExpressionReader implements ExpressionReader {
      * @throws IllegalArgumentException if there were illegal tokens
      */
     static Deque<String> tokenize(final String pExpression) throws IllegalArgumentException {
-        final String lWorkingExpression = pExpression.toUpperCase();
         final Deque<String> lExpressionTokens = new LinkedList<>();
 
         // tokenize the expression using regex
+        // trim out whitespace
+        String lWorkingExpression = pExpression.toUpperCase();
+        lWorkingExpression = lWorkingExpression.replaceAll("\\s", "");
         // TODO: check for bad expressions
         final Matcher lExprTokenizer = EXPRESSION_MATCHER.matcher(lWorkingExpression);
         while (lExprTokenizer.find()) {

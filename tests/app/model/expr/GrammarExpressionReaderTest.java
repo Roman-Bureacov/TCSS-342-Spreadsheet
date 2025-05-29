@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +33,7 @@ public class GrammarExpressionReaderTest {
                 "2+8",  "8+2",
                 "3+7",  "7+3",
                 "4+6",  "6+4",
-                "5+5"
+                "5+5", "5      +\n5"
         };
 
         for (final String expr : lExpressions) {
@@ -115,7 +116,7 @@ public class GrammarExpressionReaderTest {
     }
 
     @Test
-    public void complexFunctionTest() {
+    public void complexExpressionsTest() {
         this.iTestExpressions.put("5+3*11", (double) (5+3*11));
         this.iTestExpressions.put("5-4-3-2-1", (double) (5-4-3-2-1));
         this.iTestExpressions.put("50+3*(5-2)", (double) (50 + 3 * (5-2)));
@@ -210,6 +211,28 @@ public class GrammarExpressionReaderTest {
     }
 
     @Test
+    public void exponentTest() {
+        this.iTestExpressions.put("2^2", Math.pow(2d, 2d));
+        this.iTestExpressions.put("2^(2)", Math.pow(2d, 2d));
+        this.iTestExpressions.put("30^(-18)", Math.pow(30d, -18d));
+        this.iTestExpressions.put("(5+1)^3", Math.pow(5d+1d, 3d));
+        this.iTestExpressions.put("3^(5+1)", Math.pow(3d, 5d+1d));
+        this.iTestExpressions.put("3*3^7", 3d * Math.pow(3d, 7d));
+        this.iTestExpressions.put("3/3^7", 3d / Math.pow(3d, 7d));
+        this.iTestExpressions.put("3+3^7", 3d + Math.pow(3d, 7d));
+        this.iTestExpressions.put(
+                "5^AVG(3.15, 4)",
+                Math.pow(5d, Functions.apply("AVG", 3.15d, 4d))
+        );
+        this.iTestExpressions.put("3^3^3", Math.pow(3d, Math.pow(3d, 3d)));
+        this.iTestExpressions.put("3^(3^3)", Math.pow(3d, Math.pow(3d, 3d)));
+        this.iTestExpressions.put("(3^3)^3", Math.pow(Math.pow(3d, 3d), 3d));
+
+
+        this.runTestsOnExpressions();
+    }
+
+    @Test
     public void leadingSignTest() {
         this.iTestExpressions.put("-5+1", -5d+1d);
         this.iTestExpressions.put("5+3/(-5)", 5d+3d/(-5d));
@@ -223,6 +246,8 @@ public class GrammarExpressionReaderTest {
                 () -> this.iReader.evaluate("+2-100", this.iDummyCells),
                 "Did not throw IllegalArgumentException for leading + sign"
         );
+        this.iTestExpressions.put("-3^9", Math.pow(-3d, 9d));
+        this.iTestExpressions.put("-3^(-9)", Math.pow(-3d, -9d));
 
         this.basicTests(this.iTestExpressions);
     }
@@ -263,6 +288,20 @@ public class GrammarExpressionReaderTest {
     }
 
     @Test
+    public void nestedFunctionTest() {
+        this.iTestExpressions.put(
+                "AVG(AVG(5,3))",
+                Functions.apply("AVG", Functions.apply("AVG", 5d, 3d))
+        );
+        this.iTestExpressions.put(
+                "AVG(AVG(5,3), 9)",
+                Functions.apply("AVG", Functions.apply("AVG", 5d, 3d), 9d)
+        );
+
+        this.runTestsOnExpressions();
+    }
+
+    @Test
     public void getCellRefTest() {
         final List<String> lTestExpression1 = this.iReader.getCellRefsOf("5+R1C3");
         final List<String> lTestExpression2 = this.iReader.getCellRefsOf("5+R1C3-R33C1");
@@ -284,6 +323,13 @@ public class GrammarExpressionReaderTest {
                 () -> assertEquals("R6C2", lTestExpression3.get(1)),
                 () -> assertEquals("R1C2", lTestExpression3.get(2))
         );
+    }
+
+    /**
+     * runs tests on all the expression in the map stored in this instance
+     */
+    private void runTestsOnExpressions() {
+        this.basicTests(this.iTestExpressions);
     }
 
     /**

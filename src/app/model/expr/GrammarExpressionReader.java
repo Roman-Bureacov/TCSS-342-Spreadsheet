@@ -28,6 +28,7 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
             cellref
             "(" expression ")"
             function "(" args ")"
+            primary "^" primary
         Function
             AVG
             ... more function names
@@ -53,9 +54,13 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
             try {
                 lResult = this.nextExpression(lExpressionTokens);
             } catch (final NoSuchElementException lException) { // if unexpectedly ran out of tokens
-                throw new IllegalArgumentException("Insufficient tokens in expression");
+                throw new IllegalArgumentException(
+                        "Insufficient tokens in expression \"%s\"".formatted(pExpression)
+                );
             }
-            if (!lExpressionTokens.isEmpty()) throw new IllegalArgumentException("Bad expression");
+            if (!lExpressionTokens.isEmpty()) throw new IllegalArgumentException(
+                    "Bad expression \"%s\"".formatted(pExpression)
+            );
 
             return lResult;
         }
@@ -111,22 +116,30 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
 
     private double nextPrimary(final Deque<String> pTokens) {
         final String lLeftToken = pTokens.removeFirst();
+        final Double lLeftValue;
 
-        if (this.isNumber(lLeftToken)) return Double.parseDouble(lLeftToken);
+        if (this.isNumber(lLeftToken)) lLeftValue = Double.parseDouble(lLeftToken);
         else if (this.isCellRef(lLeftToken))
-            return this.iSpreadsheetCells.getOrDefault(lLeftToken, 0d);
+            lLeftValue = this.iSpreadsheetCells.getOrDefault(lLeftToken, 0d);
         else if ("(".equals(lLeftToken)) {
             final double lExpr = this.nextExpression(pTokens);
             if (!")".equals(pTokens.peekFirst()))
                 throw new IllegalArgumentException("Missing closing parenthesis");
             else {
                 pTokens.removeFirst();
-                return lExpr;
+                lLeftValue = lExpr;
             }
         } else if (this.isWord(lLeftToken)) {
             pTokens.addFirst(lLeftToken);
-            return this.nextFunction(pTokens);
-        } else throw new IllegalArgumentException("Unexpected symbol %s".formatted(lLeftToken));
+            lLeftValue = this.nextFunction(pTokens);
+        } else throw new IllegalArgumentException(
+                "Unexpected symbol \"%s\" in place of primary".formatted(lLeftToken)
+        );
+
+        if ("^".equals(pTokens.peekFirst())) {
+            pTokens.removeFirst();
+            return Math.pow(lLeftValue, this.nextPrimary(pTokens));
+        } else return lLeftValue;
     }
 
     private double nextFunction(final Deque<String> pTokens) {
