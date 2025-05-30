@@ -162,7 +162,25 @@ public class SpreadsheetGUI {
         public String getColumnName(int theColumn) {
             return "C" + (theColumn + 1);
         }
+
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return true; // Allow editing by clicking and typing
+        }
+
+        @Override
+        public void setValueAt(Object aValue, int row, int col) {
+            String cellName = "R" + (row + 1) + "C" + (col + 1);
+            try {
+                String input = aValue.toString();
+                myModel.setCellInstructions(input, cellName); // this must update the formula
+                fireTableDataChanged(); // refresh display
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+            }
+        }
     }
+
 
 
     // Renderer for row headers
