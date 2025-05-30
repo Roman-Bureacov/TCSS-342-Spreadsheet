@@ -26,8 +26,10 @@ public interface Spreadsheet {
      * @param theInstructions the instructions to be provided to the cell, must begin with "=" to be evaluated as an expression,
      *                        otherwise will attempt to evaluate as a literal. If not a literal and no "=", will evaluate as 0.
      * @param theRowColumn the row and column of the desired cell, as a string, in the format "R#C#"
+     *
+     * @return a boolean representing whether the new instruction produces a cycle
      */
-    public void setCellInstructions(String theInstructions, String theRowColumn);
+    public boolean setCellInstructions(String theInstructions, String theRowColumn);
     /**
      *
      * @return the amount of rows in the spreadsheet.

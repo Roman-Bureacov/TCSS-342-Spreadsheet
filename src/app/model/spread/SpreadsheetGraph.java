@@ -10,7 +10,8 @@ public class SpreadsheetGraph implements Spreadsheet {
     private final int rows;
     private final int columns;
     private final Map<String, GraphVertex> adjList;
-    ExpressionReader mainReader;
+    private boolean cycle;
+    private final ExpressionReader mainReader;
 
     public SpreadsheetGraph(int theRowNum, int theColumnNum) {
         mainReader = new GrammarExpressionReader();
@@ -42,7 +43,7 @@ public class SpreadsheetGraph implements Spreadsheet {
     }
 
     @Override
-    public void setCellInstructions(String theInstructions, String theRowColumn) {
+    public boolean setCellInstructions(String theInstructions, String theRowColumn) {
         if (mainReader.isCellRef(theRowColumn)) {
                 adjList.putIfAbsent(theRowColumn, new GraphVertex(theRowColumn));
         } else {
@@ -50,8 +51,17 @@ public class SpreadsheetGraph implements Spreadsheet {
         }
 
         GraphVertex temp = adjList.get(theRowColumn);
+        String oldInstructions = temp.getCell().getInstruction();
         temp.getCell().setInstruction(theInstructions);
         evaluateInstructions();
+        //In case of cycle
+        if(cycle) {
+            temp.getCell().setInstruction(oldInstructions);
+            cycle = false;
+            evaluateInstructions();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -70,8 +80,10 @@ public class SpreadsheetGraph implements Spreadsheet {
     }
 
     private void evaluateInstructions() {
-        setIndegree();
         Queue<GraphVertex> ordering = topSort();
+        if (!ordering.containsAll(adjList.values())) {
+            cycle = true;
+        }
 
         while (!ordering.isEmpty()) {
             Map<String, Double> readerInput = new HashMap<>();
@@ -105,6 +117,7 @@ public class SpreadsheetGraph implements Spreadsheet {
     }
 
     private Queue<GraphVertex> topSort() {
+        setIndegree();
         Queue<GraphVertex> ordering = new ArrayDeque<>();
         Queue<GraphVertex> noDegree = noDegreeQueue();
         while (!noDegree.isEmpty()) {
@@ -113,6 +126,13 @@ public class SpreadsheetGraph implements Spreadsheet {
             ordering.add(temp);
             List<GraphVertex> vertexEdgeList = temp.getAdjList();
             while (!vertexEdgeList.isEmpty()) {
+                //Cycle case
+                if (vertexEdgeList.getFirst().getAdjList().contains(temp)) {
+                    temp.removeEdge(vertexEdgeList.removeFirst());
+                    ordering.remove(temp);
+                    cycle = true;
+                    return ordering;
+                }
                 temp.removeEdge(vertexEdgeList.removeFirst());
             }
             noDegree = noDegreeQueue();
