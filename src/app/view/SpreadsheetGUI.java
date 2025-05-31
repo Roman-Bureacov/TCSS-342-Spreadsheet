@@ -4,6 +4,8 @@ import app.model.spread.Spreadsheet;
 import app.model.spread.SpreadsheetGraph;
 
 import javax.swing.*;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 
@@ -32,6 +34,8 @@ public class SpreadsheetGUI {
         myTableModel = new SpreadsheetTableModel(myModel);
         myTable = new JTable(myTableModel);
         myTable.setCellSelectionEnabled(true);
+
+        this.setCellEditor();
 
         myFrame = new JFrame("Spreadsheet App");
         myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -71,12 +75,37 @@ public class SpreadsheetGUI {
 
         myFrame.add(inputPanel, BorderLayout.SOUTH);
 
-
         myFrame.pack();
         myFrame.setLocationRelativeTo(null);
         myFrame.setVisible(true);
     }
 
+    private void setCellEditor() {
+        final JTextField lTextField = new JTextField();
+
+        final DefaultCellEditor lEditor = new DefaultCellEditor(lTextField) {
+            @Override
+            public Component getTableCellEditorComponent(final JTable table,
+                                                         final Object value,
+                                                         final boolean isSelected,
+                                                         final int row, final int column) {
+                System.out.println("I was inferred!");
+
+                final String lCellRef = "R" + (row + 1) + "C" + (column + 1);
+                String lExpression;
+                try {
+                    lExpression = myModel.getCellInstructions(lCellRef);
+                } catch (final Exception lException) {
+                    lExpression = "0";
+                }
+                //this.delegate.setValue(lExpression);
+
+                return super.getTableCellEditorComponent(table, lExpression, isSelected, row, column);
+            }
+        };
+
+        myTable.setDefaultEditor(Object.class, lEditor);
+    }
 
     private void resizeSpreadsheet() {
         JPanel panel = new JPanel(new GridLayout(2, 2));
@@ -138,6 +167,12 @@ public class SpreadsheetGUI {
 
         public SpreadsheetTableModel(Spreadsheet theModel) {
             this.myModel = theModel;
+            this.addTableModelListener(e -> {
+                if (e.getType() == TableModelEvent.UPDATE) {
+                    System.out.println("Cell update detected!");
+                }
+            });
+
         }
 
         public void setModel(Spreadsheet newModel) {
@@ -147,18 +182,18 @@ public class SpreadsheetGUI {
 
         @Override
         public int getRowCount() {
-            return myModel.rowCount();
+            return this.myModel.rowCount();
         }
 
         @Override
         public int getColumnCount() {
-            return myModel.columnCount();
+            return this.myModel.columnCount();
         }
 
         @Override
         public Object getValueAt(int row, int col) {
             String cell = "R%dC%d".formatted(row + 1, col + 1);
-            double value = myModel.getCellValue(cell);
+            double value = this.myModel.getCellValue(cell);
             return value == 0.0 ? "" : value;
         }
 
@@ -183,6 +218,8 @@ public class SpreadsheetGUI {
                 JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
             }
         }
+
+
     }
 
 
