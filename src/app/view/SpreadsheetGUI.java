@@ -67,11 +67,10 @@ public class SpreadsheetGUI {
         inputPanel.add(new JLabel("Formula:"));
         inputPanel.add(myInstructionField);
         inputPanel.add(applyButton);
-        inputPanel.add(resizeButton);   // <-- Add resize button here
+        inputPanel.add(resizeButton);
 
         myFrame.add(inputPanel, BorderLayout.SOUTH);
 
-        // Remove menu bar setup entirely (no menu bar now)
 
         myFrame.pack();
         myFrame.setLocationRelativeTo(null);
@@ -90,7 +89,7 @@ public class SpreadsheetGUI {
 
         int result = JOptionPane.showConfirmDialog(myFrame, panel, "Resize Spreadsheet",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
+        // Once OK option is selected, the rows and columns change to numbers in the text fields provided
         if (result == JOptionPane.OK_OPTION) {
             try {
                 int newRows = Integer.parseInt(rowsField.getText());
@@ -101,6 +100,7 @@ public class SpreadsheetGUI {
                 myTable.setModel(myTableModel);
                 updateRowHeader(newRows);
                 myTableModel.fireTableStructureChanged();
+                // If an invalid number (x <= 0) is chosen throw an exception
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(myFrame, "Please enter valid positive integers.");
             }
@@ -125,10 +125,14 @@ public class SpreadsheetGUI {
         return headers;
     }
 
+    // Creating the GUI
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new app.view.SpreadsheetGUI(10, 5));
     }
 
+    /**
+     * This class is used to get the spreadsheets model.
+     */
     private static class SpreadsheetTableModel extends AbstractTableModel {
         private Spreadsheet myModel;
 
@@ -153,7 +157,7 @@ public class SpreadsheetGUI {
 
         @Override
         public Object getValueAt(int row, int col) {
-            String cell = "R" + (row + 1) + "C" + (col + 1);
+            String cell = "R%dC%d".formatted(row + 1, col + 1);
             double value = myModel.getCellValue(cell);
             return value == 0.0 ? "" : value;
         }
@@ -182,8 +186,9 @@ public class SpreadsheetGUI {
     }
 
 
-
-    // Renderer for row headers
+    /**
+     * This class is used to render all the row headers.
+     */
     private static class RowHeaderRenderer extends JLabel implements ListCellRenderer<String> {
         public RowHeaderRenderer(JTable table) {
             setOpaque(true);
