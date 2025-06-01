@@ -27,7 +27,7 @@ public interface Spreadsheet {
     /**
      * retrieves the contents of a cell at the specified row and column
      * @param theRow the row to look at
-     * @param theColumn
+     * @param theColumn the column to look at
      * @return the instructions of the spreadsheet cell corresponding to the provided row/column.
      * Returns null if there is nothing at this cell.
      */
