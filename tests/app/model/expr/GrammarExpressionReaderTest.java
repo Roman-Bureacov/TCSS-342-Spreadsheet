@@ -6,17 +6,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests the grammar expression reader specifically,
+ * but may be applied to other expression readers if necessary.
+ *
+ * @author Roman Bureacov
+ * @version 2025-05
+ */
 public class GrammarExpressionReaderTest {
     private ExpressionReader iReader;
-    private Map<String, Double> iDummyCells;
-    private Map<String, Double> iTestExpressions;
+    private Map<String, Double> iDummyCells; // (cellref, valueAtLocation)
+    private Map<String, Double> iTestExpressions; // (expression, expectedValue)
 
     private static final String GENERIC_ERROR_MSG = "Expression did not evaluate correctly";
 
+    /**
+     * Sets up the testing environment
+     */
     @BeforeEach
     public void setup() {
         this.iReader = new GrammarExpressionReader();
@@ -24,6 +33,9 @@ public class GrammarExpressionReaderTest {
         this.iTestExpressions = new HashMap<>();
     }
 
+    /**
+     * Tests if addition works as intended, including a whitespace test
+     */
     @Test
     public void testAddition() {
         final double lExpected = 10d;
@@ -54,6 +66,9 @@ public class GrammarExpressionReaderTest {
         this.basicTests(this.iTestExpressions);
     }
 
+    /**
+     * Tests if multiplication works as intended
+     */
     @Test
     public void testMultiplication() {
         assertAll(
@@ -86,6 +101,9 @@ public class GrammarExpressionReaderTest {
         );
     }
 
+    /**
+     * Tests for division, including if an exception is thrown on divide-by-zero
+     */
     @Test
     public void testDivision() {
         // this test is very specific and might not work with other expression readers
@@ -115,16 +133,23 @@ public class GrammarExpressionReaderTest {
         );
     }
 
+    /**
+     * Tests the general precedence to see if it applies
+     */
     @Test
     public void complexExpressionsTest() {
         this.iTestExpressions.put("5+3*11", (double) (5+3*11));
         this.iTestExpressions.put("5-4-3-2-1", (double) (5-4-3-2-1));
         this.iTestExpressions.put("50+3*(5-2)", (double) (50 + 3 * (5-2)));
         this.iTestExpressions.put("5-(4-3)-2-1", (double) (5-(4-3)-2-1));
+        this.iTestExpressions.put("5/4-3/2-1", 5d/4d-3d/2d-1);
 
         this.basicTests(this.iTestExpressions);
     }
 
+    /**
+     * Tests if the expression reader is able to recognize floating-point numbers
+     */
     @Test
     public void floatTests() {
         this.iTestExpressions.put("5.5*3", 5.5d*3d);
@@ -137,6 +162,9 @@ public class GrammarExpressionReaderTest {
         this.basicTests(this.iTestExpressions);
     }
 
+    /**
+     * Tests if the expression reader is able to digest cellrefs
+     */
     @Test
     public void cellRefTest() {
         final double lR1C1 = 3d;
@@ -166,6 +194,9 @@ public class GrammarExpressionReaderTest {
         );
     }
 
+    /**
+     * Tests if all trule terrible expressions truly do cause exceptions
+     */
     @Test
     public void badExpressionTest() {
         final String[] lBadExpressions = {
@@ -210,6 +241,9 @@ public class GrammarExpressionReaderTest {
         }
     }
 
+    /**
+     * Test if the exponentiation works as expected
+     */
     @Test
     public void exponentTest() {
         this.iTestExpressions.put("2^2", Math.pow(2d, 2d));
@@ -233,6 +267,9 @@ public class GrammarExpressionReaderTest {
         this.runTestsOnExpressions();
     }
 
+    /**
+     * Tests for unary minus (which only appears as a leading minus sign)
+     */
     @Test
     public void leadingSignTest() {
         this.iTestExpressions.put("-5+1", -5d+1d);
@@ -253,6 +290,9 @@ public class GrammarExpressionReaderTest {
         this.basicTests(this.iTestExpressions);
     }
 
+    /**
+     * Tests if the modulus operator works as expected
+     */
     @Test
     public void modulusTest() {
         this.iTestExpressions.put("5%3", 5d%3d);
@@ -270,6 +310,9 @@ public class GrammarExpressionReaderTest {
         this.basicTests(this.iTestExpressions);
     }
 
+    /**
+     * Tests if the functions work as expected
+     */
     @Test
     public void functionsTest() {
         this.iTestExpressions.put(
@@ -304,6 +347,9 @@ public class GrammarExpressionReaderTest {
         this.basicTests(this.iTestExpressions);
     }
 
+    /**
+     * Tests if functions can be nested as expected
+     */
     @Test
     public void nestedFunctionTest() {
         this.iTestExpressions.put(
@@ -318,6 +364,9 @@ public class GrammarExpressionReaderTest {
         this.runTestsOnExpressions();
     }
 
+    /**
+     * Tests if the expression reader can fetch the cellrefs out of an expression correctly
+     */
     @Test
     public void getCellRefTest() {
         final List<String> lTestExpression1 = this.iReader.getCellRefsOf("5+R1C3");
