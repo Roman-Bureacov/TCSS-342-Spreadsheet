@@ -63,6 +63,11 @@ public class SpreadsheetGraph implements Spreadsheet {
     }
 
     @Override
+    public void setCellInstructions(final String theInstructions, final int theRow, final int theColumn) {
+        this.setCellInstructions(theInstructions, this.toCellRef(theRow, theColumn));
+    }
+
+    @Override
     public int rowCount() {
         return rows;
     }
@@ -75,6 +80,11 @@ public class SpreadsheetGraph implements Spreadsheet {
     @Override
     public int size() {
         return size;
+    }
+
+    @Override
+    public String toCellRef(final int pRow, final int pCol) {
+        return "R" + (pRow + 1) + "C" + (pCol + 1);
     }
 
     private void evaluateInstructions() {

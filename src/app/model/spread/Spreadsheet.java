@@ -5,6 +5,7 @@ package app.model.spread;
  * cells and their relations to other cells
  *
  * @author Jace Hamblin
+ * @author Roman Bureacov
  */
 public interface Spreadsheet {
 
@@ -29,6 +30,17 @@ public interface Spreadsheet {
      *
      */
     void setCellInstructions(String theInstructions, String theRowColumn);
+
+    /**
+     * Sets the instruction in the specified cell using the row and column of interest
+     * @param theInstructions the instruction to be provided to the cell, must begin with "=" to be evaluated
+     *                        as an expression, otherwise will attempt to evaluate as a literal. If not a literal
+     *                        and no "=", it will evaluate as 0.
+     * @param theRow the row to insert the instruction
+     * @param theColumn the column to insert the instruction
+     */
+    void setCellInstructions(String theInstructions, int theRow, int theColumn);
+
     /**
      *
      * @return the amount of rows in the spreadsheet.
@@ -46,4 +58,12 @@ public interface Spreadsheet {
      * @return the total size of the spreadsheet by count of cells.
      */
     int size();
+
+    /**
+     * Translates a row and column into a cellref "R#C#" (where # is a positive integer) format.
+     * @param pRow the row of interest
+     * @param pCol the column of interest
+     * @return a formatted cellref
+     */
+    String toCellRef(int pRow, int pCol);
 }
