@@ -9,6 +9,8 @@ import java.awt.*;
 
 /**
  * This is the Graphical User Interface (GUI) for the spreadsheet.
+ * It creates the main window with the table, input fields for cell and formula,
+ * and buttons to apply formulas and resize the spreadsheet.
  *
  * @author David Norman
  * @version Spring 2025
@@ -27,11 +29,41 @@ public class SpreadsheetGUI {
         initUI(rows, cols);
     }
 
-    private void initUI(int rows, int cols) {
-        myModel = new SpreadsheetGraph(rows, cols);
+    /**
+     * Initializes the user interface components, sets up event listeners,
+     * and displays the main frame with the spreadsheet table and controls.
+     *
+     * @param theRows the initial number of rows in the spreadsheet
+     * @param theCols the initial number of columns in the spreadsheet
+     */
+    private void initUI(int theRows, int theCols) {
+        myModel = new SpreadsheetGraph(theRows, theCols);
         myTableModel = new SpreadsheetTableModel(myModel);
         myTable = new JTable(myTableModel);
         myTable.setCellSelectionEnabled(true);
+
+        myTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int row = myTable.getSelectedRow();
+                int col = myTable.getSelectedColumn();
+                if (row >= 0 && col >= 0) {
+                    String cell = "R%dC%d".formatted(row + 1, col + 1);
+                    if (e.getClickCount() == 1) {
+                        // Show the formula on single click
+                        String formula = null;
+                        try {
+                            formula = myModel.getCellInstructions(cell);
+                        } catch (NullPointerException ex) {
+                            // Cell likely uninitialized — do nothing
+                        }
+                        myCellField.setText(cell);
+                        myInstructionField.setText(formula == null ? "" : formula);
+                    } else if (e.getClickCount() == 2) {
+                        myTable.editCellAt(row, col);
+                    }
+                }
+            }
+        });
 
         myFrame = new JFrame("Spreadsheet App");
         myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -39,7 +71,7 @@ public class SpreadsheetGUI {
 
         // Setup table scroll with row headers
         myScrollPane = new JScrollPane(myTable);
-        updateRowHeader(rows);
+        updateRowHeader(theRows);
         myFrame.add(myScrollPane, BorderLayout.CENTER);
 
         // Input panel
@@ -49,6 +81,7 @@ public class SpreadsheetGUI {
         JButton applyButton = new JButton("Apply");
         JButton resizeButton = new JButton("Resize");
 
+        // Listener for Apply button that applies the formula typed in the formula box
         applyButton.addActionListener(e -> {
             String cell = myCellField.getText().toUpperCase().trim();
             String formula = myInstructionField.getText().trim();
@@ -56,7 +89,27 @@ public class SpreadsheetGUI {
                 myModel.setCellInstructions(formula, cell);
                 myTableModel.fireTableDataChanged();
             } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(myFrame, "Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(myFrame, "Error: %s".formatted(ex.getMessage()));
+            }
+        });
+
+        // Updates the selected cell with the formula from the input field when Enter is pressed.
+        // Shows an error if no cell is selected or formula is invalid.
+        myInstructionField.addActionListener(e -> {
+            int row = myTable.getSelectedRow();
+            int col = myTable.getSelectedColumn();
+            if (row >= 0 && col >= 0) {
+                String cell = "R%dC%d".formatted(row + 1, col + 1);
+                String formula = myInstructionField.getText().trim();
+                try {
+                    myModel.setCellInstructions(formula, cell);
+                    myTableModel.fireTableDataChanged();
+                    myCellField.setText(cell);
+                } catch (IllegalArgumentException ex) {
+                    JOptionPane.showMessageDialog(myFrame, "Error: " + ex.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(myFrame, "Please select a cell first.");
             }
         });
 
@@ -71,12 +124,10 @@ public class SpreadsheetGUI {
 
         myFrame.add(inputPanel, BorderLayout.SOUTH);
 
-
         myFrame.pack();
         myFrame.setLocationRelativeTo(null);
         myFrame.setVisible(true);
     }
-
 
     private void resizeSpreadsheet() {
         JPanel panel = new JPanel(new GridLayout(2, 2));
@@ -107,8 +158,6 @@ public class SpreadsheetGUI {
         }
     }
 
-
-
     private void updateRowHeader(int rows) {
         JList<String> rowHeader = new JList<>(createRowHeaders(rows));
         rowHeader.setFixedCellWidth(40);
@@ -120,7 +169,7 @@ public class SpreadsheetGUI {
     private String[] createRowHeaders(int rows) {
         String[] headers = new String[rows];
         for (int i = 0; i < rows; i++) {
-            headers[i] = "R" + (i + 1);
+            headers[i] = "R%d".formatted(i + 1);
         }
         return headers;
     }
@@ -158,13 +207,25 @@ public class SpreadsheetGUI {
         @Override
         public Object getValueAt(int row, int col) {
             String cell = "R%dC%d".formatted(row + 1, col + 1);
+            String formula = null;
+
+            try {
+                formula = myModel.getCellInstructions(cell);
+            } catch (Exception e) {
+                // Cell might not exist yet; skip
+            }
+
+            if (formula != null && formula.startsWith("\"") && formula.endsWith("\"")) {
+                return formula.substring(1, formula.length() - 1); // remove quotes for string display
+            }
+
             double value = myModel.getCellValue(cell);
-            return value == 0.0 ? "" : value;
+            return value == 0.0 && (formula == null || formula.isBlank()) ? "" : value;
         }
 
         @Override
         public String getColumnName(int theColumn) {
-            return "C" + (theColumn + 1);
+            return "C%d".formatted(theColumn + 1);
         }
 
         @Override
@@ -174,20 +235,19 @@ public class SpreadsheetGUI {
 
         @Override
         public void setValueAt(Object aValue, int row, int col) {
-            String cellName = "R" + (row + 1) + "C" + (col + 1);
+            String cellName = "R%dC%d".formatted(row + 1, col + 1);
             try {
                 String input = aValue.toString();
                 myModel.setCellInstructions(input, cellName); // this must update the formula
                 fireTableDataChanged(); // refresh display
             } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Error: %s".formatted(ex.getMessage()));
             }
         }
     }
 
-
     /**
-     * This class is used to render all the row headers.
+     * This class is used to render all the row headers (Ex: R1, R2, ...)
      */
     private static class RowHeaderRenderer extends JLabel implements ListCellRenderer<String> {
         public RowHeaderRenderer(JTable table) {
