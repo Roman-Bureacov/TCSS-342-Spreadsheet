@@ -3,6 +3,7 @@ package app.view;
 import app.model.spread.Spreadsheet;
 import app.model.spread.SpreadsheetGraph;
 
+import com.formdev.flatlaf.intellijthemes.FlatSolarizedLightIJTheme;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
@@ -41,6 +42,9 @@ public class SpreadsheetGUI {
         myTableModel = new SpreadsheetTableModel(myModel);
         myTable = new JTable(myTableModel);
         myTable.setCellSelectionEnabled(true);
+
+        myTable.setShowGrid(true);
+        myTable.setGridColor(Color.GRAY);
 
         myTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -176,6 +180,7 @@ public class SpreadsheetGUI {
 
     // Creating the GUI
     public static void main(String[] args) {
+        FlatSolarizedLightIJTheme.setup();
         SwingUtilities.invokeLater(() -> new app.view.SpreadsheetGUI(10, 5));
     }
 
