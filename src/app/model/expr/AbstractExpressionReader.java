@@ -22,7 +22,7 @@ abstract class AbstractExpressionReader implements ExpressionReader {
     static {
         // regex that first looks for cellref, then floating-point, then integer,
         // then operators and parentheses, then words, and finally symbols
-        final String lExpRegex = "(R\\d+C\\d+|\\d+\\.\\d+|\\d+|[()+\\-*/]|\\w+|\\W)";
+        final String lExpRegex = "(R\\d+C\\d+|\\d+\\.\\d+|\\d+|[(,)+\\-*/%]|\\w+|\\W)";
         EXPRESSION_MATCHER = Pattern.compile(lExpRegex);
         final String lCellRefRegex = "R\\d+C\\d+";
         CELLREF_MATCHER = Pattern.compile(lCellRefRegex);
@@ -45,13 +45,17 @@ abstract class AbstractExpressionReader implements ExpressionReader {
 
         // tokenize the expression using regex
         // trim out whitespace
-        String lWorkingExpression = pExpression.toUpperCase();
-        lWorkingExpression = lWorkingExpression.replaceAll("\\s", "");
-        final Matcher lExprTokenizer = EXPRESSION_MATCHER.matcher(lWorkingExpression);
-        while (lExprTokenizer.find()) {
-            final String lToken = lExprTokenizer.group();
-            lExpressionTokens.addLast(lToken);
+        final String lWorkingExpression = pExpression.toUpperCase();
+        final String[] lExpressionComponents = lWorkingExpression.split("\\s");
+        // split on whitespace, then assemble tokens into a Deque
+        for (final String comp : lExpressionComponents) {
+            final Matcher lExprTokenizer = EXPRESSION_MATCHER.matcher(comp);
+            while (lExprTokenizer.find()) {
+                final String lToken = lExprTokenizer.group();
+                lExpressionTokens.addLast(lToken);
+            }
         }
+
 
         return lExpressionTokens;
     }

@@ -42,6 +42,8 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
      */
 
     private Map<String, Double> iSpreadsheetCells;
+    private int iFunctionCount;
+    private int iLeftParenthesisCount;
 
     @Override
     public double evaluate(final String pExpression, final Map<String, Double> pCells)
@@ -52,15 +54,14 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
             this.iSpreadsheetCells = pCells;
             final double lResult;
             try {
+                this.iFunctionCount = 0;
+                this.iLeftParenthesisCount = 0;
                 lResult = this.nextExpression(lExpressionTokens);
             } catch (final NoSuchElementException lException) { // if unexpectedly ran out of tokens
                 throw new IllegalArgumentException(
                         "Insufficient tokens in expression \"%s\"".formatted(pExpression)
                 );
             }
-            if (!lExpressionTokens.isEmpty()) throw new IllegalArgumentException(
-                    "Bad expression \"%s\"".formatted(pExpression)
-            );
 
             return lResult;
         }
@@ -79,10 +80,25 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
             switch (lNextToken) {
                 case "+" -> lLeftToken += this.nextTerm(pTokens);
                 case "-" -> lLeftToken -= this.nextTerm(pTokens);
-                default -> {
+                case "," -> {
+                    if (this.iFunctionCount == 0) // do we expect a comma here?
+                        throw new IllegalArgumentException("Unexpected comma");
+
                     pTokens.addFirst(lNextToken);
                     return lLeftToken;
                 }
+                case ")" -> {
+                    if (this.iLeftParenthesisCount == 0) // do we expect a closing parenthesis here?
+                        throw new IllegalArgumentException("Missing opening parenthesis");
+
+                    pTokens.addFirst(lNextToken);
+                    return lLeftToken;
+                }
+                case "*", "/", "%" -> { // binary operators get a pass
+                    pTokens.addFirst(lNextToken);
+                    return lLeftToken;
+                }
+                default -> throw new IllegalArgumentException("Unexpected token %s".formatted(lNextToken));
             }
         }
 
@@ -118,11 +134,14 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
         final String lLeftToken = pTokens.removeFirst();
         final Double lLeftValue;
 
-        if (this.isNumber(lLeftToken)) lLeftValue = Double.parseDouble(lLeftToken);
-        else if (this.isCellRef(lLeftToken))
+        if (this.isNumber(lLeftToken)) {
+            lLeftValue = Double.parseDouble(lLeftToken);
+        } else if (this.isCellRef(lLeftToken)) {
             lLeftValue = this.iSpreadsheetCells.getOrDefault(lLeftToken, 0d);
-        else if ("(".equals(lLeftToken)) {
+        } else if ("(".equals(lLeftToken)) {
+            this.iLeftParenthesisCount++;
             final double lExpr = this.nextExpression(pTokens);
+            this.iLeftParenthesisCount--;
             if (!")".equals(pTokens.peekFirst()))
                 throw new IllegalArgumentException("Missing closing parenthesis");
             else {
@@ -130,8 +149,12 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
                 lLeftValue = lExpr;
             }
         } else if (this.isWord(lLeftToken)) {
+            this.iFunctionCount++;
+            this.iLeftParenthesisCount++;
             pTokens.addFirst(lLeftToken);
             lLeftValue = this.nextFunction(pTokens);
+            this.iFunctionCount--;
+            this.iLeftParenthesisCount--;
         } else throw new IllegalArgumentException(
                 "Unexpected symbol \"%s\" in place of primary".formatted(lLeftToken)
         );
