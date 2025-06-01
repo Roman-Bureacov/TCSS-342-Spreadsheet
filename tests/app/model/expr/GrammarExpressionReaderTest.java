@@ -45,7 +45,7 @@ public class GrammarExpressionReaderTest {
                 "2+8",  "8+2",
                 "3+7",  "7+3",
                 "4+6",  "6+4",
-                "5+5", "5      +\n5"
+                "5+5"
         };
 
         for (final String expr : lExpressions) {
@@ -239,6 +239,21 @@ public class GrammarExpressionReaderTest {
                     "Expected IllegalArgumentException for expression %s".formatted(expression)
             );
         }
+    }
+
+    /**
+     * Tests if whitespace is properly dealt with
+     */
+    @Test
+    public void whitespaceTest() {
+        this.iTestExpressions.put("5      +\n5", 5d+5d);
+        this.iTestExpressions.put("\n\n3*\n\n\n5", 3d*5d);
+        this.iTestExpressions.put(
+                "7\n ^AVG(\r1,\r0\r,2)",
+                Math.pow(7, Functions.apply("AVG", 1d, 0d, 2d))
+        );
+
+        this.runTestsOnExpressions();
     }
 
     /**
