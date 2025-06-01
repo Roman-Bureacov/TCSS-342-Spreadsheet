@@ -142,12 +142,10 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
             this.iLeftParenthesisCount++;
             final double lExpr = this.nextExpression(pTokens);
             this.iLeftParenthesisCount--;
-            if (!")".equals(pTokens.peekFirst()))
+            if (!")".equals(pTokens.removeFirst()))
                 throw new IllegalArgumentException("Missing closing parenthesis");
-            else {
-                pTokens.removeFirst();
-                lLeftValue = lExpr;
-            }
+            else lLeftValue = lExpr;
+
         } else if (this.isWord(lLeftToken)) {
             this.iFunctionCount++;
             this.iLeftParenthesisCount++;
