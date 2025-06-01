@@ -280,9 +280,25 @@ public class GrammarExpressionReaderTest {
                 "AVG(5,2,999,2.5)",
                 Functions.apply("AVG", 5d, 2d, 999d, 2.5d)
         );
+        this.iTestExpressions.put( // synonym test
+                "AVERAGE(5,2,999,2.5)",
+                Functions.apply("AVERAGE", 5d, 2d, 999d, 2.5d)
+        );
         this.iTestExpressions.put(
                 "5+AVG(3+4,5*6,7/8)",
                 5d + Functions.apply("AVG", 3d+4d, 5d*6d, 7d/8d)
+        );
+        this.iTestExpressions.put(
+                "SUM(5,3,8)",
+                Functions.apply("SUM", 5d, 3d, 8d)
+        );
+        this.iTestExpressions.put(
+                "PROD(5,3,7)",
+                Functions.apply("PROD", 5d, 3d, 7d)
+        );
+        this.iTestExpressions.put( // synonym test
+                "PRODUCT(5,3,7)",
+                Functions.apply("PRODUCT", 5d, 3d, 7d)
         );
 
         this.basicTests(this.iTestExpressions);

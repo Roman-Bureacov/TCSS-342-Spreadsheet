@@ -15,17 +15,30 @@ final class Functions {
 
     static {
         // all recognized functions by the applications
-        FUNC.put("AVG", args -> {
+        // all functions must be capitalized and only have alpha characters, otherwise
+        // they will never be discovered by the expression reader
+        FUNC.put("AVERAGE", args -> {
             double lAvg = 0;
             final double lDenominator = args.length;
             for (final Object arg : args) lAvg += ((Double) arg) / lDenominator;
             return lAvg;
         });
-
+        FUNC.put("AVG", args -> FUNC.get("AVERAGE").apply(args)); // synonym
+        FUNC.put("PRODUCT", args -> {
+            double lProduct = 1;
+            for (final Object arg : args) lProduct *= (Double) arg;
+            return lProduct;
+        });
+        FUNC.put("PROD", args -> FUNC.get("PRODUCT").apply(args)); // synonym
+        FUNC.put("SUM", args -> {
+            double lSum = 0;
+            for (final Object arg : args) lSum += (Double) arg;
+            return lSum;
+        });
     }
 
     private Functions() {
-
+        super();
     }
 
     public static double apply(final String pFunctionName, final Object... pArgs) {

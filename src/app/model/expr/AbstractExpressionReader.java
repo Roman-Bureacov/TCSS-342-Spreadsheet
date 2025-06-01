@@ -47,7 +47,6 @@ abstract class AbstractExpressionReader implements ExpressionReader {
         // trim out whitespace
         String lWorkingExpression = pExpression.toUpperCase();
         lWorkingExpression = lWorkingExpression.replaceAll("\\s", "");
-        // TODO: check for bad expressions
         final Matcher lExprTokenizer = EXPRESSION_MATCHER.matcher(lWorkingExpression);
         while (lExprTokenizer.find()) {
             final String lToken = lExprTokenizer.group();
