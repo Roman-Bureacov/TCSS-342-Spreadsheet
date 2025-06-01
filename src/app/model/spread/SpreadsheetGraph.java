@@ -43,6 +43,11 @@ public class SpreadsheetGraph implements Spreadsheet {
     }
 
     @Override
+    public String getCellInstructions(final int theRow, final int theColumn) {
+        return this.getCellInstructions(this.toCellRef(theRow, theColumn));
+    }
+
+    @Override
     public void setCellInstructions(String theInstructions, String theRowColumn) {
         if (mainReader.isCellRef(theRowColumn)) {
                 adjList.putIfAbsent(theRowColumn, new GraphVertex(theRowColumn));

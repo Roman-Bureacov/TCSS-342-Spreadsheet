@@ -20,8 +20,18 @@ public interface Spreadsheet {
      *
      * @param theRowColumn the row and column of the desired cell, as a string, in the format "R#C#"
      * @return the instructions of the spreadsheet cell corresponding to the provided row/column.
+     * returns null if there is nothing at this cell.
      */
     String getCellInstructions(String theRowColumn);
+
+    /**
+     * retrieves the contents of a cell at the specified row and column
+     * @param theRow the row to look at
+     * @param theColumn
+     * @return the instructions of the spreadsheet cell corresponding to the provided row/column.
+     * Returns null if there is nothing at this cell.
+     */
+    String getCellInstructions(int theRow, int theColumn);
 
     /**
      * @param theInstructions the instructions to be provided to the cell, must begin with "=" to be evaluated as an expression,
