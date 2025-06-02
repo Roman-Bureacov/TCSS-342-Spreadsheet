@@ -52,11 +52,10 @@ public class SpreadsheetGraph implements Spreadsheet {
 
     @Override
     public void setCellInstructions(String theInstructions, String theRowColumn) {
-        if (mainReader.isCellRef(theRowColumn)) {
-                adjList.putIfAbsent(theRowColumn, new GraphVertex(theRowColumn));
-        } else {
+        if (!mainReader.isCellRef(theRowColumn))
             throw new IllegalArgumentException("Row and column designation is not properly formatted");
-        }
+
+        adjList.putIfAbsent(theRowColumn, new GraphVertex(theRowColumn));
 
         GraphVertex temp = adjList.get(theRowColumn);
         String oldInstructions = temp.getCell().getInstruction();
