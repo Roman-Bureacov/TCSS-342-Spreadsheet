@@ -52,6 +52,7 @@ public class SpreadsheetGraph implements Spreadsheet {
 
     @Override
     public void setCellInstructions(String theInstructions, String theRowColumn) {
+        theInstructions = theInstructions.toUpperCase();
         if (!mainReader.isCellRef(theRowColumn))
             throw new IllegalArgumentException("Row and column designation is not properly formatted");
 
