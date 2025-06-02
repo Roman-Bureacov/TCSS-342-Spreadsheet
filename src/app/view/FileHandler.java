@@ -12,7 +12,7 @@ import javax.swing.JFileChooser;
  * @version 2025-06
  */
 public final class FileHandler {
-
+    // TODO: finish some time?
     private static File sWorkingFile;
 
     private FileHandler() {
