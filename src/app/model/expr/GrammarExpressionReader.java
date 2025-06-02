@@ -32,12 +32,12 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
         Function
             AVG
             ... more function names
-        args
+        Args
             expression
             args "," expression
-        cellref
+        Cellref
             "R" integer "C" integer
-        number
+        Number
             floating-point-literal
      */
 
@@ -147,6 +147,9 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
             else lLeftValue = lExpr;
 
         } else if (this.isWord(lLeftToken)) {
+            if (!Functions.functionExists(lLeftToken))
+                throw new IllegalArgumentException("Unknown function %s".formatted(lLeftToken));
+
             this.iFunctionCount++;
             this.iLeftParenthesisCount++;
             pTokens.addFirst(lLeftToken);
