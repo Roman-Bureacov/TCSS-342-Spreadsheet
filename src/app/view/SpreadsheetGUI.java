@@ -4,84 +4,67 @@ import app.model.spread.Spreadsheet;
 import app.model.spread.SpreadsheetGraph;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 
 /**
- * This is the Graphical User Interface (GUI) for the spreadsheet.
- * It creates the main window with the table, input fields for cell and formula,
- * and buttons to apply formulas and resize the spreadsheet.
+ * This is the Graphical User Interface (GUI) for the spreadsheet application.
+ * It allows users to view, edit, and resize the spreadsheet, enter formulas,
+ * and see results dynamically.
  *
  * @author David Norman
  * @version Spring 2025
  */
-
 public class SpreadsheetGUI {
-    private Spreadsheet myModel;
-    private JTable myTable;
-    private JTextField myInstructionField;
-    private JTextField myCellField;
-    private SpreadsheetTableModel myTableModel;
-    private JFrame myFrame;
-    private JScrollPane myScrollPane;
+    private Spreadsheet myModel;             // The spreadsheet data model
+    private JTable myTable;                  // Table component displaying the spreadsheet
+    private JTextField myInstructionField;  // Field for entering formulas/instructions
+    private JTextField myCellField;         // Field for specifying the cell reference (e.g., R1C1)
+    private SpreadsheetTableModel myTableModel; // Table model wrapping the spreadsheet data
+    private JFrame myFrame;                  // Main application window
+    private JScrollPane myScrollPane;       // Scroll pane containing the spreadsheet table
 
-    public SpreadsheetGUI(int rows, int cols) {
-        initUI(rows, cols);
+    /**
+     * Constructor initializes the UI with given rows and columns.
+     */
+    public SpreadsheetGUI(int theRows, int theCols) {
+        initUI(theRows, theCols);
     }
 
     /**
-     * Initializes the user interface components, sets up event listeners,
-     * and displays the main frame with the spreadsheet table and controls.
+     * Sets up the UI components and event handlers.
      *
-     * @param theRows the initial number of rows in the spreadsheet
-     * @param theCols the initial number of columns in the spreadsheet
+     * @param theRows Number of rows in the spreadsheet
+     * @param theCols Number of columns in the spreadsheet
      */
     private void initUI(int theRows, int theCols) {
-        myModel = new SpreadsheetGraph(theRows, theCols);
+        myModel = new SpreadsheetGraph(theRows, theCols);  // Initialize spreadsheet data model
         myTableModel = new SpreadsheetTableModel(myModel);
         myTable = new JTable(myTableModel);
         myTable.setCellSelectionEnabled(true);
 
-        myTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                int row = myTable.getSelectedRow();
-                int col = myTable.getSelectedColumn();
-                if (row >= 0 && col >= 0) {
-                    String cell = "R%dC%d".formatted(row + 1, col + 1);
-                    if (e.getClickCount() == 1) {
-                        // Show the formula on single click
-                        String formula = null;
-                        try {
-                            formula = myModel.getCellInstructions(cell);
-                        } catch (NullPointerException ex) {
-                            // Cell likely uninitialized — do nothing
-                        }
-                        myCellField.setText(cell);
-                        myInstructionField.setText(formula == null ? "" : formula);
-                    } else if (e.getClickCount() == 2) {
-                        myTable.editCellAt(row, col);
-                    }
-                }
-            }
-        });
+        // Configure custom cell editor to show formulas on edit
+        this.setCellEditor();
 
+        // Setup main application window
         myFrame = new JFrame("Spreadsheet App");
         myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         myFrame.setLayout(new BorderLayout());
 
-        // Setup table scroll with row headers
+        // Add spreadsheet table inside a scroll pane with row headers
         myScrollPane = new JScrollPane(myTable);
-        updateRowHeader(theRows);
+        updateRowHeader(theRows); // Setup row headers on the left
         myFrame.add(myScrollPane, BorderLayout.CENTER);
 
-        // Input panel
+        // Create input panel for cell reference and formula entry
         JPanel inputPanel = new JPanel(new FlowLayout());
         myCellField = new JTextField("R1C1", 5);
         myInstructionField = new JTextField("=5+3", 20);
         JButton applyButton = new JButton("Apply");
         JButton resizeButton = new JButton("Resize");
 
-        // Listener for Apply button that applies the formula typed in the formula box
+        // When 'Apply' clicked, update the cell formula and refresh table
         applyButton.addActionListener(e -> {
             String cell = myCellField.getText().toUpperCase().trim();
             String formula = myInstructionField.getText().trim();
@@ -89,32 +72,14 @@ public class SpreadsheetGUI {
                 myModel.setCellInstructions(formula, cell);
                 myTableModel.fireTableDataChanged();
             } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(myFrame, "Error: %s".formatted(ex.getMessage()));
+                JOptionPane.showMessageDialog(myFrame, String.format("Error: %s", ex.getMessage()));
             }
         });
 
-        // Updates the selected cell with the formula from the input field when Enter is pressed.
-        // Shows an error if no cell is selected or formula is invalid.
-        myInstructionField.addActionListener(e -> {
-            int row = myTable.getSelectedRow();
-            int col = myTable.getSelectedColumn();
-            if (row >= 0 && col >= 0) {
-                String cell = "R%dC%d".formatted(row + 1, col + 1);
-                String formula = myInstructionField.getText().trim();
-                try {
-                    myModel.setCellInstructions(formula, cell);
-                    myTableModel.fireTableDataChanged();
-                    myCellField.setText(cell);
-                } catch (IllegalArgumentException ex) {
-                    JOptionPane.showMessageDialog(myFrame, "Error: " + ex.getMessage());
-                }
-            } else {
-                JOptionPane.showMessageDialog(myFrame, "Please select a cell first.");
-            }
-        });
-
+        // When 'Resize' clicked, open dialog to resize spreadsheet
         resizeButton.addActionListener(e -> resizeSpreadsheet());
 
+        // Add all input controls to the input panel
         inputPanel.add(new JLabel("Cell:"));
         inputPanel.add(myCellField);
         inputPanel.add(new JLabel("Formula:"));
@@ -124,11 +89,52 @@ public class SpreadsheetGUI {
 
         myFrame.add(inputPanel, BorderLayout.SOUTH);
 
+        // Finalize window size and make it visible
         myFrame.pack();
         myFrame.setLocationRelativeTo(null);
         myFrame.setVisible(true);
     }
 
+    /**
+     * Sets a custom cell editor for the JTable so that
+     * when a cell is edited, the formula/instruction is shown,
+     * not just the evaluated value.
+     */
+    private void setCellEditor() {
+        final JTextField lTextField = new JTextField();
+        lTextField.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        final DefaultCellEditor lEditor = new DefaultCellEditor(lTextField) {
+            @Override
+            public Component getTableCellEditorComponent(final JTable table,
+                                                         final Object value,
+                                                         final boolean isSelected,
+                                                         final int row, final int column) {
+
+                // Construct cell reference string like "R1C1"
+                final String lCellRef = String.format("R%dC%d", row + 1, column + 1);
+                String lExpression;
+                try {
+                    // Get the formula/instruction from the model for this cell
+                    lExpression = myModel.getCellInstructions(lCellRef);
+                } catch (final Exception lException) {
+                    // Default to "0" if no formula exists or error occurs
+                    lExpression = "0";
+                }
+
+                // Return editor component showing the formula string
+                return super.getTableCellEditorComponent(table, lExpression, isSelected, row, column);
+            }
+        };
+
+        // Set the default editor for all table cells to our custom editor
+        myTable.setDefaultEditor(Object.class, lEditor);
+    }
+
+    /**
+     * Opens a dialog box allowing the user to resize
+     * the spreadsheet (change rows and columns).
+     * Updates the model and refreshes the UI accordingly.
+     */
     private void resizeSpreadsheet() {
         JPanel panel = new JPanel(new GridLayout(2, 2));
         JTextField rowsField = new JTextField(String.valueOf(myModel.rowCount()), 5);
@@ -140,47 +146,64 @@ public class SpreadsheetGUI {
 
         int result = JOptionPane.showConfirmDialog(myFrame, panel, "Resize Spreadsheet",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        // Once OK option is selected, the rows and columns change to numbers in the text fields provided
         if (result == JOptionPane.OK_OPTION) {
             try {
                 int newRows = Integer.parseInt(rowsField.getText());
                 int newCols = Integer.parseInt(colsField.getText());
                 if (newRows <= 0 || newCols <= 0) throw new NumberFormatException();
+
+                // Create new spreadsheet model with new size
                 myModel = new SpreadsheetGraph(newRows, newCols);
                 myTableModel.setModel(myModel);
                 myTable.setModel(myTableModel);
                 updateRowHeader(newRows);
                 myTableModel.fireTableStructureChanged();
-                // If an invalid number (x <= 0) is chosen throw an exception
             } catch (NumberFormatException ex) {
+                // Show error if user inputs invalid sizes
                 JOptionPane.showMessageDialog(myFrame, "Please enter valid positive integers.");
             }
         }
     }
 
-    private void updateRowHeader(int rows) {
-        JList<String> rowHeader = new JList<>(createRowHeaders(rows));
+    /**
+     * Updates the row header JList on the left of the table
+     * to show row labels (R1, R2, etc.) according to row count.
+     *
+     * @param theRows Number of rows in the spreadsheet
+     */
+    private void updateRowHeader(int theRows) {
+        JList<String> rowHeader = new JList<>(createRowHeaders(theRows));
         rowHeader.setFixedCellWidth(40);
         rowHeader.setFixedCellHeight(myTable.getRowHeight());
         rowHeader.setCellRenderer(new RowHeaderRenderer(myTable));
         myScrollPane.setRowHeaderView(rowHeader);
     }
 
-    private String[] createRowHeaders(int rows) {
-        String[] headers = new String[rows];
-        for (int i = 0; i < rows; i++) {
-            headers[i] = "R%d".formatted(i + 1);
+    /**
+     * Creates an array of row header strings ("R1", "R2", etc.)
+     * based on the number of rows.
+     *
+     * @param theRows Number of rows
+     * @return Array of row header labels
+     */
+    private String[] createRowHeaders(int theRows) {
+        String[] headers = new String[theRows];
+        for (int i = 0; i < theRows; i++) {
+            headers[i] = String.format("R%d", i + 1);
         }
         return headers;
     }
 
-    // Creating the GUI
+    /**
+     * Main entry point. Launches the GUI.
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new app.view.SpreadsheetGUI(10, 5));
     }
 
     /**
-     * This class is used to get the spreadsheets model.
+     * Table model bridging the Spreadsheet data to JTable.
+     * Handles cell value retrieval, editing, and column/row counts.
      */
     private static class SpreadsheetTableModel extends AbstractTableModel {
         private Spreadsheet myModel;
@@ -189,65 +212,60 @@ public class SpreadsheetGUI {
             this.myModel = theModel;
         }
 
+        /**
+         * Replace the current model and notify table structure change.
+         */
         public void setModel(Spreadsheet newModel) {
             this.myModel = newModel;
-            fireTableStructureChanged(); // Notify listeners immediately
+            fireTableStructureChanged();
         }
 
         @Override
         public int getRowCount() {
-            return myModel.rowCount();
+            return this.myModel.rowCount();
         }
 
         @Override
         public int getColumnCount() {
-            return myModel.columnCount();
+            return this.myModel.columnCount();
         }
 
         @Override
-        public Object getValueAt(int row, int col) {
-            String cell = "R%dC%d".formatted(row + 1, col + 1);
-            String formula = null;
-
-            try {
-                formula = myModel.getCellInstructions(cell);
-            } catch (Exception e) {
-                // Cell might not exist yet; skip
-            }
-
-            if (formula != null && formula.startsWith("\"") && formula.endsWith("\"")) {
-                return formula.substring(1, formula.length() - 1); // remove quotes for string display
-            }
-
-            double value = myModel.getCellValue(cell);
-            return value == 0.0 && (formula == null || formula.isBlank()) ? "" : value;
+        public Object getValueAt(int theRow, int theCol) {
+            // Use formatted cell reference string
+            String cell = String.format("R%dC%d", theRow + 1, theCol + 1);
+            double value = this.myModel.getCellValue(cell);
+            // Display empty string instead of 0.0 for better UX
+            return value == 0.0 ? "" : value;
         }
 
         @Override
-        public String getColumnName(int theColumn) {
-            return "C%d".formatted(theColumn + 1);
+        public String getColumnName(int theCol) {
+            return String.format("C%d", theCol + 1);
         }
 
         @Override
-        public boolean isCellEditable(int row, int col) {
-            return true; // Allow editing by clicking and typing
+        public boolean isCellEditable(int theRow, int theCol) {
+            return true; // All cells are editable
         }
 
         @Override
-        public void setValueAt(Object aValue, int row, int col) {
-            String cellName = "R%dC%d".formatted(row + 1, col + 1);
+        public void setValueAt(Object aValue, int theRow, int theCol) {
+            String cellName = String.format("R%dC%d", theRow + 1, theCol + 1);
             try {
                 String input = aValue.toString();
-                myModel.setCellInstructions(input, cellName); // this must update the formula
-                fireTableDataChanged(); // refresh display
+                // Set new formula/instruction in the model
+                myModel.setCellInstructions(input, cellName);
+                fireTableDataChanged(); // Refresh table view
             } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(null, "Error: %s".formatted(ex.getMessage()));
+                JOptionPane.showMessageDialog(null, String.format("Error: %s", ex.getMessage()));
             }
         }
     }
 
     /**
-     * This class is used to render all the row headers (Ex: R1, R2, ...)
+     * Renderer for row headers shown to the left of the spreadsheet.
+     * Matches the style of the table header.
      */
     private static class RowHeaderRenderer extends JLabel implements ListCellRenderer<String> {
         public RowHeaderRenderer(JTable table) {
