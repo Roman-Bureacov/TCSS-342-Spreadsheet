@@ -18,6 +18,8 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
             term
             expression "+" term
             expression "-" term
+            "-" expression "+" term
+            "-" expression "-" term
         Term
             primary
             term "*" primary
