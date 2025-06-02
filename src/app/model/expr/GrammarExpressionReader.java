@@ -147,7 +147,7 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
             else lLeftValue = lExpr;
 
         } else if (this.isWord(lLeftToken)) {
-            if (!Functions.functionExists(lLeftToken))
+            if (!Functions.validFunctionName(lLeftToken))
                 throw new IllegalArgumentException("Unknown function %s".formatted(lLeftToken));
 
             this.iFunctionCount++;

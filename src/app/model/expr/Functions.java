@@ -41,6 +41,12 @@ final class Functions {
         super();
     }
 
+    /**
+     * Applies the corresponding function to the arguments.
+     * @param pFunctionName the name of the function of interest
+     * @param pArgs the arguments to apply the function to
+     * @return the calculated double value of the function applied on the arguments
+     */
     public static double apply(final String pFunctionName, final Object... pArgs) {
         try {
             return FUNC.get(pFunctionName).apply(pArgs);
@@ -51,7 +57,13 @@ final class Functions {
         }
     }
 
-    public static boolean functionExists(final String pFunctionName) {
+    /**
+     * Queries if the function is recognized. Note that function names are all uppercase.
+     * @param pFunctionName the function name to query, without converting to uppercase and
+     *                      in its original case.
+     * @return if the function is recognized
+     */
+    public static boolean validFunctionName(final String pFunctionName) {
         return FUNC.containsKey(pFunctionName);
     }
 }
