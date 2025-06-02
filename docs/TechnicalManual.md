@@ -14,6 +14,8 @@ Expression
     term
     expression "+" term
     expression "-" term
+    "-" expression "+" term
+    "-" expression "-" term
 Term
     primary
     term "*" primary
