@@ -35,7 +35,10 @@ public class SpreadsheetGraph implements Spreadsheet {
         theRowColumn = theRowColumn.trim();
         String returnInstructions;
         if (mainReader.isCellRef(theRowColumn)) {
-            returnInstructions = adjList.get(theRowColumn).getCell().getInstruction();
+            final GraphVertex returnVertex = adjList.get(theRowColumn);
+            if (returnVertex != null) {
+                returnInstructions = returnVertex.getCell().getInstruction();
+            } else returnInstructions = null;
         } else {
             throw  new IllegalArgumentException("Row and column designation is not properly formatted");
         }
