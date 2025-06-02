@@ -5,6 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import javax.swing.JFileChooser;
 
+/**
+ * utility class that handles saving and opening files
+ *
+ * @author Roman Bureacov
+ * @version 2025-06
+ */
 public final class FileHandler {
 
     private static File sWorkingFile;
