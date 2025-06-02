@@ -208,35 +208,30 @@ public class SpreadsheetGUI {
      * Handles cell value retrieval, editing, and column/row counts.
      */
     private class SpreadsheetTableModel extends AbstractTableModel {
-        private Spreadsheet myModel;
-
-        public SpreadsheetTableModel(Spreadsheet theModel) {
-            this.myModel = theModel;
-        }
 
         /**
          * Replace the current model and notify table structure change.
          */
         public void setModel(Spreadsheet newModel) {
-            this.myModel = newModel;
+            myModel = newModel;
             fireTableStructureChanged();
         }
 
         @Override
         public int getRowCount() {
-            return this.myModel.rowCount();
+            return myModel.rowCount();
         }
 
         @Override
         public int getColumnCount() {
-            return this.myModel.columnCount();
+            return myModel.columnCount();
         }
 
         @Override
         public Object getValueAt(int theRow, int theCol) {
             // Use formatted cell reference string
             String cell = String.format("R%dC%d", theRow + 1, theCol + 1);
-            double value = this.myModel.getCellValue(cell);
+            double value = myModel.getCellValue(cell);
             // Display empty string instead of 0.0 for better UX
             return value == 0.0 ? "" : value;
         }
