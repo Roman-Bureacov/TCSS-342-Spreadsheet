@@ -5,6 +5,8 @@ import app.model.spread.SpreadsheetGraph;
 
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 
@@ -113,13 +115,13 @@ public class SpreadsheetGUI {
                 // Construct cell reference string like "R1C1"
                 final String lCellRef = String.format("R%dC%d", row + 1, column + 1);
                 String lExpression;
-                try {
-                    // Get the formula/instruction from the model for this cell
-                    lExpression = myModel.getCellInstructions(lCellRef);
-                } catch (final Exception lException) {
-                    // Default to "0" if no formula exists or error occurs
-                    lExpression = "0";
-                }
+                // Get the formula/instruction from the model for this cell
+                lExpression = myModel.getCellInstructions(lCellRef);
+                if (lExpression == null) lExpression = "";
+
+                // set the formula bar components
+                myCellField.setText(lCellRef);
+                myInstructionField.setText(lExpression);
 
                 // Return editor component showing the formula string
                 return super.getTableCellEditorComponent(table, lExpression, isSelected, row, column);
@@ -205,7 +207,7 @@ public class SpreadsheetGUI {
      * Table model bridging the Spreadsheet data to JTable.
      * Handles cell value retrieval, editing, and column/row counts.
      */
-    private static class SpreadsheetTableModel extends AbstractTableModel {
+    private class SpreadsheetTableModel extends AbstractTableModel {
         private Spreadsheet myModel;
 
         public SpreadsheetTableModel(Spreadsheet theModel) {
@@ -256,6 +258,7 @@ public class SpreadsheetGUI {
                 String input = aValue.toString();
                 // Set new formula/instruction in the model
                 myModel.setCellInstructions(input, cellName);
+                myInstructionField.setText(input);
                 fireTableDataChanged(); // Refresh table view
             } catch (IllegalArgumentException ex) {
                 JOptionPane.showMessageDialog(null, String.format("Error: %s", ex.getMessage()));
@@ -267,7 +270,7 @@ public class SpreadsheetGUI {
      * Renderer for row headers shown to the left of the spreadsheet.
      * Matches the style of the table header.
      */
-    private static class RowHeaderRenderer extends JLabel implements ListCellRenderer<String> {
+    private class RowHeaderRenderer extends JLabel implements ListCellRenderer<String> {
         public RowHeaderRenderer(JTable table) {
             setOpaque(true);
             setHorizontalAlignment(CENTER);
