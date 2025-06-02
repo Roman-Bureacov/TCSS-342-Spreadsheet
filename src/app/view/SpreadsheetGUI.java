@@ -42,7 +42,7 @@ public class SpreadsheetGUI {
      */
     private void initUI(int theRows, int theCols) {
         myModel = new SpreadsheetGraph(theRows, theCols);  // Initialize spreadsheet data model
-        myTableModel = new SpreadsheetTableModel(myModel);
+        myTableModel = new SpreadsheetTableModel();
         myTable = new JTable(myTableModel);
         myTable.setCellSelectionEnabled(true);
 
