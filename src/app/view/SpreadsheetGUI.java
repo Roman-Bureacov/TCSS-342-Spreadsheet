@@ -223,9 +223,12 @@ public class SpreadsheetGUI {
         public Object getValueAt(int theRow, int theCol) {
             // Use formatted cell reference string
             String cell = String.format("R%dC%d", theRow + 1, theCol + 1);
-            double value = myModel.getCellValue(cell);
-            // Display empty string instead of 0.0 for better UX
-            return value == 0.0 ? "" : value;
+            String cellInstr = myModel.getCellInstructions(cell);
+            if (cellInstr == null) return "";
+            else {
+                if (cellInstr.startsWith("=")) return myModel.getCellValue(cell);
+                else return cellInstr;
+            }
         }
 
         @Override
