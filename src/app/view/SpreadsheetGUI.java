@@ -16,6 +16,7 @@ import java.awt.*;
  * and see results dynamically.
  *
  * @author David Norman
+ * @author Roman Bureacov
  * @version Spring 2025
  */
 public class SpreadsheetGUI {
@@ -156,7 +157,6 @@ public class SpreadsheetGUI {
 
                 // Create new spreadsheet model with new size
                 myModel = new SpreadsheetGraph(newRows, newCols);
-                myTableModel.setModel(myModel);
                 myTable.setModel(myTableModel);
                 updateRowHeader(newRows);
                 myTableModel.fireTableStructureChanged();
@@ -208,14 +208,6 @@ public class SpreadsheetGUI {
      * Handles cell value retrieval, editing, and column/row counts.
      */
     private class SpreadsheetTableModel extends AbstractTableModel {
-
-        /**
-         * Replace the current model and notify table structure change.
-         */
-        public void setModel(Spreadsheet newModel) {
-            myModel = newModel;
-            fireTableStructureChanged();
-        }
 
         @Override
         public int getRowCount() {
