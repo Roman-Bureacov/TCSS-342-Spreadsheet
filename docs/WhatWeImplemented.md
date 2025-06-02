@@ -1,5 +1,7 @@
 # David Norman
-
+Created the `SpreadsheetGUI` class which makes it so that you are able to view, edit, and resize the spreadsheet.
+You are also able to add formulas to the cells and be able to see the evaluated value while not editing the current cell.
+If you are editing the cell, you will see the originally enter item (whether that be a formula, string, integer, etc.).
 # Jace Hamblin
 
 # Roman Bureacov
