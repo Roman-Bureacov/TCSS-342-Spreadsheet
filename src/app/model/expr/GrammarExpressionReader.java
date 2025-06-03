@@ -4,7 +4,6 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 /**
  * An expression reader than reads in expressions as a grammar.
