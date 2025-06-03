@@ -52,7 +52,7 @@ public class SpreadsheetGraph implements Spreadsheet {
 
     @Override
     public void setCellInstructions(String theInstructions, String theRowColumn) {
-        theInstructions = theInstructions.toUpperCase().trim();
+        theInstructions = theInstructions.trim();
         if (!mainReader.isCellRef(theRowColumn))
             throw new IllegalArgumentException("Row and column designation is not properly formatted");
 
@@ -60,6 +60,7 @@ public class SpreadsheetGraph implements Spreadsheet {
             adjList.remove(theRowColumn);
             evaluateInstructions();
         } else {
+            if (theInstructions.startsWith("=")) theInstructions = theInstructions.toUpperCase();
             adjList.putIfAbsent(theRowColumn, new GraphVertex(theRowColumn));
 
             GraphVertex temp = adjList.get(theRowColumn);
