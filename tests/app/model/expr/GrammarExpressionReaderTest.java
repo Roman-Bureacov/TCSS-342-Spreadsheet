@@ -278,6 +278,11 @@ public class GrammarExpressionReaderTest {
         this.iTestExpressions.put("3^(3^3)", Math.pow(3d, Math.pow(3d, 3d)));
         this.iTestExpressions.put("(3^3)^3", Math.pow(Math.pow(3d, 3d), 3d));
 
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> this.iReader.evaluate("0^(-2)", this.iDummyCells),
+                "IllegalArgumentException expected for division by zero"
+        );
 
         this.runTestsOnExpressions();
     }
