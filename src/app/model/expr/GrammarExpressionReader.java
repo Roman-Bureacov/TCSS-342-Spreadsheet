@@ -4,6 +4,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * An expression reader than reads in expressions as a grammar.
@@ -134,14 +135,17 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
 
     private double nextPrimary(final Deque<String> pTokens) {
         final String lLeftToken = pTokens.removeFirst();
-        final Double lLeftValue;
+        final double lLeftValue;
 
         if (this.isNumber(lLeftToken)) {
             lLeftValue = Double.parseDouble(lLeftToken);
         } else if (this.isCellRef(lLeftToken)) {
-            if (this.iSpreadsheetCells.containsKey(lLeftToken))
-                lLeftValue = this.iSpreadsheetCells.getOrDefault(lLeftToken, 0d);
-            else lLeftValue = 0d; // read all nulls as zeroes
+            // check if the cell is even a number or not, null only occurs if the token is mapped to a null
+            final Double lIntermediate = this.iSpreadsheetCells.getOrDefault(lLeftToken, 0d);
+            if (lIntermediate == null) throw new IllegalArgumentException(
+                    "Cell %s does not contain a number".formatted(lLeftToken)
+            );
+            lLeftValue =  lIntermediate;
         } else if ("(".equals(lLeftToken)) {
             this.iLeftParenthesisCount++;
             final double lExpr = this.nextExpression(pTokens);

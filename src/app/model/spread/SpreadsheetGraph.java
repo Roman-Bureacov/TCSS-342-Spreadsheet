@@ -52,21 +52,26 @@ public class SpreadsheetGraph implements Spreadsheet {
 
     @Override
     public void setCellInstructions(String theInstructions, String theRowColumn) {
-        theInstructions = theInstructions.toUpperCase();
+        theInstructions = theInstructions.toUpperCase().trim();
         if (!mainReader.isCellRef(theRowColumn))
             throw new IllegalArgumentException("Row and column designation is not properly formatted");
 
-        adjList.putIfAbsent(theRowColumn, new GraphVertex(theRowColumn));
+        if (theInstructions.isEmpty()) {
+            adjList.remove(theRowColumn);
+            evaluateInstructions();
+        } else {
+            adjList.putIfAbsent(theRowColumn, new GraphVertex(theRowColumn));
 
-        GraphVertex temp = adjList.get(theRowColumn);
-        String oldInstructions = temp.getCell().getInstruction();
-        temp.getCell().setInstruction(theInstructions);
-        evaluateInstructions();
-        //In case of cycle
-        if(cycle) {
-            temp.getCell().setInstruction(oldInstructions);
-            cycle = false;
-            throw new IllegalArgumentException("Cycle detected, cyclic instructions invalid");
+            GraphVertex temp = adjList.get(theRowColumn);
+            String oldInstructions = temp.getCell().getInstruction();
+            temp.getCell().setInstruction(theInstructions);
+            evaluateInstructions();
+            //In case of cycle
+            if(cycle) {
+                temp.getCell().setInstruction(oldInstructions);
+                cycle = false;
+                throw new IllegalArgumentException("Cycle detected, cyclic instructions invalid");
+            }
         }
     }
 
