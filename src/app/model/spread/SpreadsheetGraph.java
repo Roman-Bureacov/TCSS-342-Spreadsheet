@@ -189,25 +189,30 @@ public class SpreadsheetGraph implements Spreadsheet {
     //Method to evaluate each cells function and set its value to the result
     private void evaluateInstructions() {
         Queue<GraphVertex> ordering = topSort();
-        //Cycle checker
+        //Cycle checker, ordering should always contain all values unless cycle
         if (!ordering.containsAll(adjList.values())) {
             cycle = true;
             return;
         }
 
         while (!ordering.isEmpty()) {
+            //Construct a valid map of values for the expression reader to read
             Map<String, Double> readerInput = new HashMap<>();
             Collection<GraphVertex> vertices = adjList.values();
             for (GraphVertex tempStorage : vertices) {
                 readerInput.put(tempStorage.getRowColumn(), tempStorage.getCell().getValue());
             }
+
             GraphVertex nextToCalc = ordering.remove();
             String expression = nextToCalc.getCell().getInstruction();
             if (expression.startsWith("=")) {
                 // is an expression
+
+                //Strip "=" so the expression reader can read the expression
                 expression = expression.substring(1);
                 List<String> cellRefs = mainReader.getCellRefsOf(expression);
                 while (!cellRefs.isEmpty()) {
+                    //Any nonexistent cell refs are treated as empty cells, thus 0
                     if (adjList.get(cellRefs.getFirst()) == null) {
                         expression = expression.replaceAll(cellRefs.getFirst(), "0");
                     }
@@ -270,12 +275,15 @@ public class SpreadsheetGraph implements Spreadsheet {
     private void setIndegree() {
         Collection<GraphVertex> vertices = adjList.values();
         for (GraphVertex tempVertex : vertices) {
+            //Reset indegree, since values are not necessarily 0 after evaluation
             tempVertex.setIndegree(0);
+            //If not an expression then no indegree, so do nothing, otherwise:
             if (tempVertex.getCell().getInstruction().startsWith("=")) {
                 String cleanedString = tempVertex.getCell().getInstruction().substring(1);
                 List<String> CellRefs = mainReader.getCellRefsOf(cleanedString);
                 while (!CellRefs.isEmpty()) {
                     if (adjList.get(CellRefs.getFirst()) != null) {
+                        //Check to ensure cell being referenced doesn't already have an edge to this cell
                         if (!adjList.get(CellRefs.getFirst()).getAdjList().contains(tempVertex)) {
                             adjList.get(CellRefs.getFirst()).addEdge(tempVertex);
                         }

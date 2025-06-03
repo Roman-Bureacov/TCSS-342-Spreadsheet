@@ -1,7 +1,5 @@
 package app.model.spread;
 
-import java.util.regex.Pattern;
-
 /**
  * Class representing a single spreadsheet cell
  * @author Jace Hamblin
@@ -10,6 +8,9 @@ public class SpreadsheetCell {
     private Double value;
     private String instruction;
 
+    /**
+     * Constructor for spreadsheet cell.
+     */
     public SpreadsheetCell() {
         value = null;
         instruction = "";
