@@ -3,6 +3,8 @@ package app.view;
 import app.model.spread.Spreadsheet;
 import app.model.spread.SpreadsheetGraph;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.AbstractTableModel;
@@ -79,6 +81,18 @@ public class SpreadsheetGUI {
 
         // When 'Resize' clicked, open dialog to resize spreadsheet
         resizeButton.addActionListener(e -> resizeSpreadsheet());
+
+        // listener for to update the formula bar when clicking on a cell
+        myTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(final MouseEvent e) {
+                final Point lMousePoint = e.getPoint();
+                final int lRow = myTable.rowAtPoint(lMousePoint);
+                final int lCol = myTable.columnAtPoint(lMousePoint);
+                myCellField.setText(myModel.toCellRef(lRow, lCol));
+                myInstructionField.setText(myModel.getCellInstructions(lRow, lCol));
+            }
+        });
 
         // Add all input controls to the input panel
         inputPanel.add(new JLabel("Cell:"));
