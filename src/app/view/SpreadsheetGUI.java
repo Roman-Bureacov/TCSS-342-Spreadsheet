@@ -251,7 +251,7 @@ public class SpreadsheetGUI {
                 // Set new formula/instruction in the model
                 myModel.setCellInstructions(input, cellName);
                 myInstructionField.setText(input);
-                super.setValueAt(this.getValueAt(theRow, theCol), theRow, theCol);
+                this.fireTableDataChanged();
             } catch (IllegalArgumentException ex) {
                 JOptionPane.showMessageDialog(null, String.format("Error: %s", ex.getMessage()));
             }
