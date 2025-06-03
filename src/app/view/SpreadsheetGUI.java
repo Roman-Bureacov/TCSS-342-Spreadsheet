@@ -5,8 +5,6 @@ import app.model.spread.SpreadsheetGraph;
 
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 
@@ -264,7 +262,7 @@ public class SpreadsheetGUI {
      * Renderer for row headers shown to the left of the spreadsheet.
      * Matches the style of the table header.
      */
-    private class RowHeaderRenderer extends JLabel implements ListCellRenderer<String> {
+    private static class RowHeaderRenderer extends JLabel implements ListCellRenderer<String> {
         public RowHeaderRenderer(JTable table) {
             setOpaque(true);
             setHorizontalAlignment(CENTER);
