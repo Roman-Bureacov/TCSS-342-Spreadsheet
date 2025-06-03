@@ -138,8 +138,8 @@ public class SpreadsheetGUI {
      */
     private void resizeSpreadsheet() {
         JPanel panel = new JPanel(new GridLayout(2, 2));
-        JTextField rowsField = new JTextField(String.valueOf(myModel.rowCount()), 5);
-        JTextField colsField = new JTextField(String.valueOf(myModel.columnCount()), 5);
+        JTextField rowsField = new JTextField(String.valueOf(myModel.getRowCount()), 5);
+        JTextField colsField = new JTextField(String.valueOf(myModel.getColumnCount()), 5);
         panel.add(new JLabel("Rows:"));
         panel.add(rowsField);
         panel.add(new JLabel("Columns:"));
@@ -154,8 +154,8 @@ public class SpreadsheetGUI {
                 if (newRows <= 0 || newCols <= 0) throw new NumberFormatException();
 
                 // Create new spreadsheet model with new size
-                myModel = new SpreadsheetGraph(newRows, newCols);
-                myTable.setModel(myTableModel);
+                myModel.setRowCount(newCols);
+                myModel.setColumnCount(newCols);
                 updateRowHeader(newRows);
                 myTableModel.fireTableStructureChanged();
             } catch (NumberFormatException ex) {
@@ -209,12 +209,12 @@ public class SpreadsheetGUI {
 
         @Override
         public int getRowCount() {
-            return myModel.rowCount();
+            return myModel.getRowCount();
         }
 
         @Override
         public int getColumnCount() {
-            return myModel.columnCount();
+            return myModel.getColumnCount();
         }
 
         @Override

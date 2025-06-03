@@ -56,13 +56,25 @@ public interface Spreadsheet {
      *
      * @return the amount of rows in the spreadsheet.
      */
-    int rowCount();
+    int getRowCount();
 
     /**
      *
      * @return the amount of columns in the spreadsheet.
      */
-    int columnCount();
+    int getColumnCount();
+
+    /**
+     * Sets the row count for this spreadsheet
+     * @param theCount the number of rows to resize to
+     */
+    void setRowCount(int theCount);
+
+    /**
+     * Sets the columns count for this spreadsheet
+     * @param theCount the number of columns to resize to
+     */
+    void setColumnCount(int theCount);
 
     /**
      *

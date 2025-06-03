@@ -7,8 +7,8 @@ import java.util.*;
 
 public class SpreadsheetGraph implements Spreadsheet {
     private final int size;
-    private final int rows;
-    private final int columns;
+    private int rows;
+    private int columns;
     private final Map<String, GraphVertex> adjList;
     private boolean cycle;
     private final ExpressionReader mainReader;
@@ -82,13 +82,23 @@ public class SpreadsheetGraph implements Spreadsheet {
     }
 
     @Override
-    public int rowCount() {
+    public int getRowCount() {
         return rows;
     }
 
     @Override
-    public int columnCount() {
+    public int getColumnCount() {
         return columns;
+    }
+
+    @Override
+    public void setRowCount(final int theCount) {
+        rows = theCount;
+    }
+
+    @Override
+    public void setColumnCount(final int theCount) {
+        columns = theCount;
     }
 
     @Override

@@ -2,7 +2,6 @@ package app.view;
 
 import app.model.spread.Spreadsheet;
 import java.io.File;
-import java.io.IOException;
 import javax.swing.JFileChooser;
 
 /**
@@ -26,8 +25,8 @@ public final class FileHandler {
 
     public void save(final Spreadsheet pSpreadsheet) {
         final StringBuilder lFileBuilder = new StringBuilder();
-        for (int col = 0; col < pSpreadsheet.columnCount(); col++) {
-            for (int row = 0; row < pSpreadsheet.rowCount(); row++) {
+        for (int col = 0; col < pSpreadsheet.getColumnCount(); col++) {
+            for (int row = 0; row < pSpreadsheet.getRowCount(); row++) {
                 final String lCellContents = pSpreadsheet.getCellInstructions(row, col);
                 if (lCellContents == null) {
                     lFileBuilder.append(",");
