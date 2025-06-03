@@ -134,7 +134,7 @@ public class SpreadsheetGUI {
     /**
      * Opens a dialog box allowing the user to resize
      * the spreadsheet (change rows and columns).
-     * Updates the model and refreshes the UI accordingly.
+     * Updates the model and keeps the prior formulas.
      */
     private void resizeSpreadsheet() {
         JPanel panel = new JPanel(new GridLayout(2, 2));
@@ -154,7 +154,7 @@ public class SpreadsheetGUI {
                 if (newRows <= 0 || newCols <= 0) throw new NumberFormatException();
 
                 // Create new spreadsheet model with new size
-                myModel.setRowCount(newCols);
+                myModel.setRowCount(newRows);
                 myModel.setColumnCount(newCols);
                 updateRowHeader(newRows);
                 myTableModel.fireTableStructureChanged();
