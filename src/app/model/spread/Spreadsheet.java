@@ -12,9 +12,10 @@ public interface Spreadsheet {
     /**
      *
      * @param theRowColumn the row and column of the desired cell, as a string, in the format "R#C#"
-     * @return the value of the spreadsheet cell corresponding to the provided row/column.
+     * @return the value of the spreadsheet cell corresponding to the provided row/column. Returns null if
+     * the expressions failed to evaluate or if the cell stores a string literal.
      */
-    double getCellValue(String theRowColumn);
+    Double getCellValue(String theRowColumn);
 
     /**
      *

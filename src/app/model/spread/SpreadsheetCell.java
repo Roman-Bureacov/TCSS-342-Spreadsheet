@@ -7,11 +7,11 @@ import java.util.regex.Pattern;
  * @author Jace Hamblin
  */
 public class SpreadsheetCell {
-    private double value;
+    private Double value;
     private String instruction;
 
     public SpreadsheetCell() {
-        value = 0;
+        value = null;
         instruction = "";
     }
 
@@ -19,7 +19,7 @@ public class SpreadsheetCell {
      * Sets the value of the cell to theValue
      * @param theValue value cell will be set to
      */
-    public void setValue(double theValue) {
+    public void setValue(Double theValue) {
         value = theValue;
     }
 
@@ -27,7 +27,7 @@ public class SpreadsheetCell {
      * Gets the value of the cell
      * @return the value of the cell
      */
-    public double getValue() {
+    public Double getValue() {
         return value;
     }
 

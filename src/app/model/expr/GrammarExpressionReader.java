@@ -139,7 +139,9 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
         if (this.isNumber(lLeftToken)) {
             lLeftValue = Double.parseDouble(lLeftToken);
         } else if (this.isCellRef(lLeftToken)) {
-            lLeftValue = this.iSpreadsheetCells.getOrDefault(lLeftToken, 0d);
+            if (this.iSpreadsheetCells.containsKey(lLeftToken))
+                lLeftValue = this.iSpreadsheetCells.getOrDefault(lLeftToken, 0d);
+            else lLeftValue = 0d; // read all nulls as zeroes
         } else if ("(".equals(lLeftToken)) {
             this.iLeftParenthesisCount++;
             final double lExpr = this.nextExpression(pTokens);

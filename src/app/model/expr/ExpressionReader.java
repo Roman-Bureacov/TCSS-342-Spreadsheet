@@ -17,8 +17,10 @@ public interface ExpressionReader {
      * @param pExpression the expression, as a string, to evaluate
      * @param pCells the table of cells and their values
      * @return the value of the expression
+     * @throws IllegalArgumentException when an expression is either invalid
+     * or produces a bad result (such as division by zero)
      */
-    double evaluate(String pExpression, Map<String, Double> pCells);
+    double evaluate(String pExpression, Map<String, Double> pCells) throws IllegalArgumentException;
 
     /**
      * Returns a list of the cell references used in the expression

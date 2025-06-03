@@ -22,11 +22,11 @@ public class SpreadsheetGraph implements Spreadsheet {
     }
 
     @Override
-    public double getCellValue(String theRowColumn) {
+    public Double getCellValue(String theRowColumn) {
         if (adjList.containsKey(theRowColumn)) {
             return adjList.get(theRowColumn).getCell().getValue();
         } else {
-            return 0d;
+            return null;
         }
     }
 
@@ -112,6 +112,7 @@ public class SpreadsheetGraph implements Spreadsheet {
             GraphVertex nextToCalc = ordering.remove();
             String expression = nextToCalc.getCell().getInstruction();
             if (expression.startsWith("=")) {
+                // is an expression
                 expression = expression.substring(1);
                 List<String> cellRefs = mainReader.getCellRefsOf(expression);
                 while (!cellRefs.isEmpty()) {
@@ -120,13 +121,21 @@ public class SpreadsheetGraph implements Spreadsheet {
                     }
                     cellRefs.removeFirst();
                 }
-                nextToCalc.getCell().setValue(mainReader.evaluate(expression, readerInput));
-            } else {
                 try {
+                    nextToCalc.getCell().setValue(mainReader.evaluate(expression, readerInput));
+                } catch (Exception exc) {
+                    nextToCalc.getCell().setValue(null);
+                    throw exc;
+                }
+            } else {
+                // is some literal
+                expression = expression.trim();
+                nextToCalc.getCell().setInstruction(expression);
+                if (mainReader.isNumber(expression)) {
                     double literal = Double.parseDouble(nextToCalc.getCell().getInstruction());
                     nextToCalc.getCell().setValue(literal);
-                } catch (NumberFormatException ex) {
-                    nextToCalc.getCell().setValue(0);
+                } else {
+                    nextToCalc.getCell().setValue(null);
                 }
             }
         }

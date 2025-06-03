@@ -226,7 +226,11 @@ public class SpreadsheetGUI {
             String cellInstr = myModel.getCellInstructions(cell);
             if (cellInstr == null) return "";
             else {
-                if (cellInstr.startsWith("=")) return myModel.getCellValue(cell);
+                if (cellInstr.startsWith("=")) {
+                    // there is an expression here that failed to evaluate
+                    if (myModel.getCellValue(cell) == null) return "#ERR";
+                    else return myModel.getCellValue(cell);
+                }
                 else return cellInstr;
             }
         }
