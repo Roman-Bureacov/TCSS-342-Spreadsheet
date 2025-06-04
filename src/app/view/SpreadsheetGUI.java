@@ -20,6 +20,9 @@ import java.awt.*;
  * @version Spring 2025
  */
 public class SpreadsheetGUI {
+    private static Font MONOSPACE_FORMULA_BAR = new Font(Font.MONOSPACED, Font.PLAIN, 14);
+    private static Font MONOSPACE_CELL = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+
     private Spreadsheet myModel;             // The spreadsheet data model
     private JTable myTable;                  // Table component displaying the spreadsheet
     private JTextField myInstructionField;  // Field for entering formulas/instructions
@@ -62,8 +65,8 @@ public class SpreadsheetGUI {
 
         // Create input panel for cell reference and formula entry
         JPanel inputPanel = new JPanel(new FlowLayout());
-        myCellField = new JTextField("R1C1", 5);
-        myInstructionField = new JTextField("=5+3", 20);
+        myCellField = new JTextField("R1C1", 8);
+        myInstructionField = new JTextField("=5+3", 30);
         JButton applyButton = new JButton("Apply");
         JButton resizeButton = new JButton("Resize");
 
@@ -94,6 +97,10 @@ public class SpreadsheetGUI {
             }
         });
 
+        // set fonts
+        myCellField.setFont(MONOSPACE_FORMULA_BAR);
+        myInstructionField.setFont(MONOSPACE_FORMULA_BAR);
+
         // Add all input controls to the input panel
         inputPanel.add(new JLabel("Cell:"));
         inputPanel.add(myCellField);
@@ -117,7 +124,11 @@ public class SpreadsheetGUI {
      */
     private void setCellEditor() {
         final JTextField lTextField = new JTextField();
+
+        // format cell editor
+        lTextField.setFont(MONOSPACE_CELL);
         lTextField.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+
         final DefaultCellEditor lEditor = new DefaultCellEditor(lTextField) {
             @Override
             public Component getTableCellEditorComponent(final JTable table,

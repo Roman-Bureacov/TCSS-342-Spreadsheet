@@ -169,7 +169,9 @@ public final class GrammarExpressionReader extends AbstractExpressionReader {
 
         if ("^".equals(pTokens.peekFirst())) {
             pTokens.removeFirst();
-            return Math.pow(lLeftValue, this.nextPrimary(pTokens));
+            final double lRightValue = this.nextPrimary(pTokens);
+            if (lLeftValue == 0d && lRightValue < 0) throw new IllegalArgumentException("Division by zero");
+            return Math.pow(lLeftValue, lRightValue);
         } else return lLeftValue;
     }
 
